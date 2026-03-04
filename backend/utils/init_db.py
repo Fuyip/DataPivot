@@ -12,6 +12,8 @@ sys.path.insert(0, str(root_dir))
 from sqlalchemy.orm import Session
 from database import engine, SessionLocal, Base
 from backend.models.user import User
+from backend.models.case import Case, UserCasePermission
+from backend.models.permission import Permission
 from backend.core.security import get_password_hash
 
 
@@ -23,8 +25,8 @@ def create_tables():
 
 
 def create_default_admin(db: Session):
-    """创建默认管理员账户"""
-    print("正在检查默认管理员账户...")
+    """创建默认超级管理员账户"""
+    print("正在检查默认超级管理员账户...")
 
     # 检查是否已存在管理员账户
     admin = db.query(User).filter(User.username == "admin").first()
@@ -32,12 +34,12 @@ def create_default_admin(db: Session):
         print("✓ 管理员账户已存在，跳过创建")
         return
 
-    # 创建管理员账户
+    # 创建超级管理员账户
     admin_user = User(
         username="admin",
         hashed_password=get_password_hash("admin123"),
-        full_name="系统管理员",
-        role="admin",
+        full_name="系统超级管理员",
+        role="super_admin",
         is_active=True
     )
 
@@ -45,9 +47,10 @@ def create_default_admin(db: Session):
     db.commit()
     db.refresh(admin_user)
 
-    print("✓ 默认管理员账户创建成功")
+    print("✓ 默认超级管理员账户创建成功")
     print(f"  用户名: admin")
     print(f"  密码: admin123")
+    print(f"  角色: super_admin")
     print(f"  ⚠️  请在生产环境中立即修改默认密码！")
 
 

@@ -63,18 +63,18 @@ class UserCasePermissionBase(BaseModel):
     """用户案件权限基础Schema"""
     user_id: int = Field(..., description="用户ID")
     case_id: int = Field(..., description="案件ID")
-    permission_level: str = Field(default="read", pattern="^(read|write|admin)$", description="权限级别")
+    permission_level: str = Field(default="read", pattern="^(admin|write|read)$", description="权限级别")
 
 
 class UserCasePermissionCreate(BaseModel):
     """创建用户案件权限Schema"""
     user_id: int = Field(..., description="用户ID")
-    permission_level: str = Field(default="read", pattern="^(read|write|admin)$", description="权限级别")
+    permission_level: str = Field(default="read", pattern="^(admin|write|read)$", description="权限级别")
 
 
 class UserCasePermissionUpdate(BaseModel):
     """更新用户案件权限Schema"""
-    permission_level: str = Field(..., pattern="^(read|write|admin)$", description="权限级别")
+    permission_level: str = Field(..., pattern="^(admin|write|read)$", description="权限级别")
 
 
 class UserCasePermissionInDB(UserCasePermissionBase):

@@ -13,6 +13,7 @@ class UserBase(BaseModel):
 class UserCreate(UserBase):
     """创建用户Schema"""
     password: str = Field(..., min_length=6, description="密码")
+    role: Optional[str] = Field("user", pattern="^(super_admin|admin|user)$", description="角色: super_admin/admin/user")
 
 
 class UserUpdate(BaseModel):
@@ -20,6 +21,7 @@ class UserUpdate(BaseModel):
     email: Optional[EmailStr] = None
     full_name: Optional[str] = None
     password: Optional[str] = None
+    role: Optional[str] = Field(None, pattern="^(super_admin|admin|user)$", description="角色: super_admin/admin/user")
     is_active: Optional[bool] = None
 
 

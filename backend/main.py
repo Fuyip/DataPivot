@@ -11,7 +11,7 @@ root_dir = Path(__file__).parent.parent
 sys.path.insert(0, str(root_dir))
 
 from backend.core.config import config
-from backend.api.v1 import auth, users, cases, case_permissions
+from backend.api.v1 import auth, users, cases, case_permissions, permissions
 
 # 创建 FastAPI 应用实例
 app = FastAPI(
@@ -63,6 +63,7 @@ app.include_router(auth.router, prefix="/api/v1")
 app.include_router(users.router, prefix="/api/v1")
 app.include_router(cases.router, prefix="/api/v1")
 app.include_router(case_permissions.router, prefix="/api/v1")
+app.include_router(permissions.router, prefix="/api/v1")
 
 
 if __name__ == "__main__":

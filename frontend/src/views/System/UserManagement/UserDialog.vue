@@ -44,6 +44,7 @@
 
       <el-form-item label="角色" prop="role">
         <el-select v-model="formData.role" placeholder="请选择角色" style="width: 100%">
+          <el-option label="超级管理员" value="super_admin" />
           <el-option label="管理员" value="admin" />
           <el-option label="普通用户" value="user" />
         </el-select>

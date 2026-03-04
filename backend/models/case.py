@@ -1,7 +1,17 @@
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, Text, ForeignKey
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, Text, ForeignKey, Table
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 from database import Base
+
+
+# 用户案件权限关联表（多对多）
+user_case_permission_association = Table(
+    'user_case_permission_details',
+    Base.metadata,
+    Column('user_case_permission_id', Integer, ForeignKey('user_case_permissions.id'), primary_key=True),
+    Column('permission_id', Integer, ForeignKey('permissions.id'), primary_key=True),
+    comment="用户案件权限详细关联表"
+)
 
 
 class Case(Base):
@@ -42,6 +52,8 @@ class UserCasePermission(Base):
 
     # 关联关系
     case = relationship("Case", back_populates="permissions")
+    # TODO: 细粒度权限控制，暂时不使用
+    # permissions = relationship("backend.models.permission.Permission", secondary=user_case_permission_association, lazy="joined")
 
     def __repr__(self):
-        return f"<UserCasePermission(user_id={self.user_id}, case_id={self.case_id}, level='{self.permission_level}')>"
+        return f"<UserCasePermission(user_id={self.user_id}, case_id={self.case_id}, permission_level='{self.permission_level}')>"

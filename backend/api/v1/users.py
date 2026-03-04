@@ -41,12 +41,16 @@ def get_users(
     Returns:
         dict: 用户列表和总数
     """
-    # 检查权限
-    if current_user.role != "admin":
+    # 检查权限 - 超级管理员和管理员都可以查看用户列表
+    if current_user.role not in ["super_admin", "admin"]:
         return error_response(403, "权限不足，需要管理员权限")
 
     # 构建查询
     query = db.query(User)
+
+    # 管理员只能查看自己创建的用户
+    if current_user.role == "admin":
+        query = query.filter(User.created_by == current_user.id)
 
     # 应用筛选条件
     if username:
@@ -105,7 +109,17 @@ def get_user(
         dict: 用户详细信息
     """
     # 只有管理员或用户本人可以查看
-    if current_user.role != "admin" and current_user.id != user_id:
+    if current_user.role == "super_admin":
+        # 超级管理员可以查看任何用户
+        pass
+    elif current_user.role == "admin":
+        # 管理员只能查看自己创建的用户
+        user = db.query(User).filter(User.id == user_id).first()
+        if not user:
+            return error_response(404, "用户不存在")
+        if user.created_by != current_user.id and user.id != current_user.id:
+            return error_response(403, "权限不足")
+    elif current_user.id != user_id:
         return error_response(403, "权限不足")
 
     user = db.query(User).filter(User.id == user_id).first()
@@ -143,8 +157,15 @@ def create_user(
     Returns:
         dict: 创建的用户信息
     """
-    # 检查权限
-    if current_user.role != "admin":
+    # 检查权限 - 超级管理员可以创建任何角色，管理员只能创建普通用户
+    if current_user.role == "super_admin":
+        # 超级管理员可以创建任何角色
+        pass
+    elif current_user.role == "admin":
+        # 管理员只能创建普通用户
+        if user_data.role != "user":
+            return error_response(403, "管理员只能创建普通用户")
+    else:
         return error_response(403, "权限不足，需要管理员权限")
 
     # 检查用户名是否已存在
@@ -164,8 +185,9 @@ def create_user(
         hashed_password=get_password_hash(user_data.password),
         full_name=user_data.full_name,
         email=user_data.email,
-        role="user",  # 默认角色为普通用户
-        is_active=True
+        role=user_data.role,  # 使用传入的角色，默认为 user
+        is_active=True,
+        created_by=current_user.id  # 记录创建人
     )
 
     db.add(new_user)
@@ -205,7 +227,17 @@ def update_user(
         dict: 更新后的用户信息
     """
     # 只有管理员或用户本人可以更新
-    if current_user.role != "admin" and current_user.id != user_id:
+    if current_user.role == "super_admin":
+        # 超级管理员可以更新任何用户
+        pass
+    elif current_user.role == "admin":
+        # 管理员只能更新自己创建的用户或自己
+        user = db.query(User).filter(User.id == user_id).first()
+        if not user:
+            return error_response(404, "用户不存在")
+        if user.created_by != current_user.id and user.id != current_user.id:
+            return error_response(403, "权限不足")
+    elif current_user.id != user_id:
         return error_response(403, "权限不足")
 
     user = db.query(User).filter(User.id == user_id).first()
@@ -229,9 +261,18 @@ def update_user(
     if user_data.password is not None:
         user.hashed_password = get_password_hash(user_data.password)
 
+    # 只有超级管理员可以修改角色
+    if user_data.role is not None:
+        if current_user.role != "super_admin":
+            return error_response(403, "只有超级管理员可以修改用户角色")
+        # 不能修改自己的角色
+        if current_user.id == user_id:
+            return error_response(400, "不能修改自己的角色")
+        user.role = user_data.role
+
     # 只有管理员可以修改激活状态
     if user_data.is_active is not None:
-        if current_user.role != "admin":
+        if current_user.role not in ["super_admin", "admin"]:
             return error_response(403, "只有管理员可以修改用户激活状态")
         user.is_active = user_data.is_active
 
@@ -268,8 +309,8 @@ def delete_user(
     Returns:
         dict: 删除结果
     """
-    # 检查权限
-    if current_user.role != "admin":
+    # 检查权限 - 超级管理员和管理员都可以删除用户
+    if current_user.role not in ["super_admin", "admin"]:
         return error_response(403, "权限不足，需要管理员权限")
 
     # 不能删除自己
@@ -280,6 +321,11 @@ def delete_user(
     if not user:
         return error_response(404, "用户不存在")
 
+    # 管理员只能删除自己创建的用户
+    if current_user.role == "admin":
+        if user.created_by != current_user.id:
+            return error_response(403, "权限不足，只能删除自己创建的用户")
+
     db.delete(user)
     db.commit()
 
@@ -289,12 +335,12 @@ def delete_user(
 @router.put("/{user_id}/role", summary="修改用户角色")
 def update_user_role(
     user_id: int,
-    role: str = Query(..., regex="^(admin|user)$", description="角色: admin 或 user"),
+    role: str = Query(..., pattern="^(super_admin|admin|user)$", description="角色: super_admin/admin/user"),
     db: Session = Depends(get_system_db),
     current_user: User = Depends(get_current_active_user)
 ):
     """
-    修改用户角色（需要管理员权限）
+    修改用户角色（需要超级管理员权限）
 
     Args:
         user_id: 用户ID
@@ -305,9 +351,9 @@ def update_user_role(
     Returns:
         dict: 更新结果
     """
-    # 检查权限
-    if current_user.role != "admin":
-        return error_response(403, "权限不足，需要管理员权限")
+    # 只有超级管理员可以修改角色
+    if current_user.role != "super_admin":
+        return error_response(403, "权限不足，需要超级管理员权限")
 
     # 不能修改自己的角色
     if current_user.id == user_id:
@@ -351,7 +397,17 @@ def reset_user_password(
         dict: 重置结果
     """
     # 只有管理员或用户本人可以重置密码
-    if current_user.role != "admin" and current_user.id != user_id:
+    if current_user.role == "super_admin":
+        # 超级管理员可以重置任何用户密码
+        pass
+    elif current_user.role == "admin":
+        # 管理员只能重置自己创建的用户或自己的密码
+        user = db.query(User).filter(User.id == user_id).first()
+        if not user:
+            return error_response(404, "用户不存在")
+        if user.created_by != current_user.id and user.id != current_user.id:
+            return error_response(403, "权限不足")
+    elif current_user.id != user_id:
         return error_response(403, "权限不足")
 
     user = db.query(User).filter(User.id == user_id).first()

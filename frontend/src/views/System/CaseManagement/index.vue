@@ -189,7 +189,7 @@ import PermissionDialog from './PermissionDialog.vue'
 
 const authStore = useAuthStore()
 const currentUser = computed(() => authStore.user)
-const isAdmin = computed(() => currentUser.value?.role === 'admin')
+const isAdmin = computed(() => ['super_admin', 'admin'].includes(currentUser.value?.role))
 
 const activeTab = ref('all')
 const loading = ref(false)

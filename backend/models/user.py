@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean, DateTime
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey
 from sqlalchemy.sql import func
 from database import Base
 
@@ -12,8 +12,9 @@ class User(Base):
     hashed_password = Column(String(255), nullable=False, comment="加密密码")
     full_name = Column(String(100), comment="真实姓名")
     email = Column(String(100), unique=True, index=True, comment="邮箱")
-    role = Column(String(20), default="user", comment="角色: admin/user")
+    role = Column(String(20), default="user", comment="角色: super_admin/admin/user")
     is_active = Column(Boolean, default=True, comment="是否激活")
+    created_by = Column(Integer, ForeignKey("users.id"), comment="创建人ID")
     created_at = Column(DateTime(timezone=True), server_default=func.now(), comment="创建时间")
     updated_at = Column(DateTime(timezone=True), onupdate=func.now(), comment="更新时间")
 

@@ -10,9 +10,9 @@ from database import get_system_db
 from backend.models.case import Case, UserCasePermission
 from backend.models.user import User
 from backend.schemas.case import (
+    UserCasePermission as PermissionSchema,
     UserCasePermissionCreate,
-    UserCasePermissionUpdate,
-    UserCasePermission as PermissionSchema
+    UserCasePermissionUpdate
 )
 from backend.schemas.common import success_response, error_response
 from backend.services.auth_service import get_current_active_user
@@ -38,7 +38,11 @@ def get_case_permissions(
         return error_response(404, "案件不存在")
 
     # 权限检查
-    if current_user.role != "admin":
+    if current_user.role == "super_admin":
+        # 超级管理员可以查看所有案件的权限
+        pass
+    else:
+        # admin 和 user 都需要有该案件的管理权限
         if not check_case_permission(db, current_user.id, case_id, "admin"):
             return error_response(403, "权限不足，需要该案件的管理权限")
 
@@ -84,19 +88,37 @@ def create_case_permission(
     if not case:
         return error_response(404, "案件不存在")
 
+    # 从 Schema 中获取字段
+    user_id = permission_data.user_id
+    permission_level = permission_data.permission_level
+
     # 权限检查
-    if current_user.role != "admin":
+    if current_user.role == "super_admin":
+        # 超级管理员可以给任何用户分配权限
+        pass
+    elif current_user.role == "admin":
+        # 管理员只能给自己创建的用户分配自己管理的案件权限
+        if not check_case_permission(db, current_user.id, case_id, "admin"):
+            return error_response(403, "权限不足，需要该案件的管理权限")
+        # 检查目标用户是否是自己创建的
+        target_user = db.query(User).filter(User.id == user_id).first()
+        if not target_user:
+            return error_response(404, "目标用户不存在")
+        if target_user.created_by != current_user.id:
+            return error_response(403, "权限不足，只能给自己创建的用户分配权限")
+    else:
+        # 普通用户需要有管理权限
         if not check_case_permission(db, current_user.id, case_id, "admin"):
             return error_response(403, "权限不足，需要该案件的管理权限")
 
     # 检查目标用户是否存在
-    target_user = db.query(User).filter(User.id == permission_data.user_id).first()
+    target_user = db.query(User).filter(User.id == user_id).first()
     if not target_user:
         return error_response(404, "目标用户不存在")
 
     # 检查是否已有权限
     existing_permission = db.query(UserCasePermission).filter(
-        UserCasePermission.user_id == permission_data.user_id,
+        UserCasePermission.user_id == user_id,
         UserCasePermission.case_id == case_id
     ).first()
 
@@ -105,9 +127,9 @@ def create_case_permission(
 
     # 创建权限
     new_permission = UserCasePermission(
-        user_id=permission_data.user_id,
+        user_id=user_id,
         case_id=case_id,
-        permission_level=permission_data.permission_level,
+        permission_level=permission_level,
         granted_by=current_user.id
     )
     db.add(new_permission)
@@ -144,8 +166,15 @@ def update_case_permission(
     if not case:
         return error_response(404, "案件不存在")
 
+    # 从 Schema 中获取权限级别
+    permission_level = permission_data.permission_level
+
     # 权限检查
-    if current_user.role != "admin":
+    if current_user.role == "super_admin":
+        # 超级管理员可以修改所有权限
+        pass
+    else:
+        # admin 和 user 都需要有该案件的管理权限
         if not check_case_permission(db, current_user.id, case_id, "admin"):
             return error_response(403, "权限不足，需要该案件的管理权限")
 
@@ -163,7 +192,7 @@ def update_case_permission(
         return error_response(400, "不允许修改案件创建者的管理权限")
 
     # 更新权限级别
-    permission.permission_level = permission_data.permission_level
+    permission.permission_level = permission_level
     db.commit()
     db.refresh(permission)
 
@@ -197,7 +226,11 @@ def delete_case_permission(
         return error_response(404, "案件不存在")
 
     # 权限检查
-    if current_user.role != "admin":
+    if current_user.role == "super_admin":
+        # 超级管理员可以撤销所有权限
+        pass
+    else:
+        # admin 和 user 都需要有该案件的管理权限
         if not check_case_permission(db, current_user.id, case_id, "admin"):
             return error_response(403, "权限不足，需要该案件的管理权限")
 
@@ -233,7 +266,7 @@ def get_user_cases(
     - 普通用户只能查看自己
     """
     # 权限检查
-    if current_user.role != "admin" and current_user.id != user_id:
+    if current_user.role not in ["super_admin", "admin"] and current_user.id != user_id:
         return error_response(403, "权限不足，只能查看自己的案件列表")
 
     # 查询用户

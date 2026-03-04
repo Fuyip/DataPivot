@@ -14,6 +14,7 @@
 
         <el-form-item label="角色">
           <el-select v-model="searchForm.role" placeholder="请选择角色" clearable style="width: 150px">
+            <el-option label="超级管理员" value="super_admin" />
             <el-option label="管理员" value="admin" />
             <el-option label="普通用户" value="user" />
           </el-select>
@@ -52,10 +53,10 @@
         <el-table-column prop="username" label="用户名" width="150" />
         <el-table-column prop="full_name" label="姓名" width="150" />
         <el-table-column prop="email" label="邮箱" width="200" />
-        <el-table-column prop="role" label="角色" width="100">
+        <el-table-column prop="role" label="角色" width="120">
           <template #default="{ row }">
-            <el-tag :type="row.role === 'admin' ? 'danger' : 'info'">
-              {{ row.role === 'admin' ? '管理员' : '普通用户' }}
+            <el-tag :type="row.role === 'super_admin' ? 'danger' : row.role === 'admin' ? 'warning' : 'info'">
+              {{ row.role === 'super_admin' ? '超级管理员' : row.role === 'admin' ? '管理员' : '普通用户' }}
             </el-tag>
           </template>
         </el-table-column>
@@ -67,9 +68,18 @@
           </template>
         </el-table-column>
         <el-table-column prop="created_at" label="创建时间" width="180" />
-        <el-table-column label="操作" width="280" fixed="right">
+        <el-table-column label="操作" width="380" fixed="right">
           <template #default="{ row }">
             <el-button size="small" @click="handleEdit(row)">编辑</el-button>
+            <el-button
+              v-if="currentUser?.role === 'super_admin'"
+              size="small"
+              type="primary"
+              @click="handleChangeRole(row)"
+              :disabled="row.id === currentUser?.id"
+            >
+              修改角色
+            </el-button>
             <el-button size="small" type="warning" @click="handleResetPassword(row)">重置密码</el-button>
             <el-button
               size="small"
@@ -231,6 +241,35 @@ async function handleResetPassword(row) {
   } catch (error) {
     if (error !== 'cancel') {
       ElMessage.error('密码重置失败')
+    }
+  }
+}
+
+// 修改角色
+async function handleChangeRole(row) {
+  try {
+    const { value } = await ElMessageBox.prompt(
+      `请选择用户 "${row.username}" 的新角色`,
+      '修改角色',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        inputType: 'select',
+        inputOptions: [
+          { label: '超级管理员', value: 'super_admin' },
+          { label: '管理员', value: 'admin' },
+          { label: '普通用户', value: 'user' }
+        ],
+        inputValue: row.role
+      }
+    )
+
+    await userApi.updateUserRole(row.id, value)
+    ElMessage.success('角色修改成功')
+    fetchUserList()
+  } catch (error) {
+    if (error !== 'cancel') {
+      ElMessage.error('角色修改失败')
     }
   }
 }

@@ -42,8 +42,22 @@ def get_cases(
     # 构建查询（排除已删除的案件）
     query = db.query(Case).filter(Case.is_active == True, Case.is_deleted == False)
 
-    # 如果是普通用户，只返回有权限的案件
-    if current_user.role != "admin":
+    # 根据用户角色过滤案件
+    if current_user.role == "super_admin":
+        # 超级管理员可以查看所有案件
+        pass
+    elif current_user.role == "admin":
+        # 管理员只能查看自己是管理员的案件
+        admin_permissions = db.query(UserCasePermission).filter(
+            UserCasePermission.user_id == current_user.id,
+            UserCasePermission.permission_level == "admin"
+        ).all()
+        case_ids = [p.case_id for p in admin_permissions]
+        if not case_ids:
+            return success_response(data={"items": [], "total": 0, "page": page, "page_size": page_size})
+        query = query.filter(Case.id.in_(case_ids))
+    else:
+        # 普通用户只返回有权限的案件
         user_cases = get_user_cases(db, current_user.id)
         case_ids = [c.id for c in user_cases]
         if not case_ids:
@@ -87,7 +101,7 @@ def get_cases(
         }
 
         # 添加当前用户的权限级别
-        if current_user.role == "admin":
+        if current_user.role == "super_admin":
             case_dict["user_permission"] = "admin"
         else:
             case_dict["user_permission"] = get_case_permission_level(db, current_user.id, case.id)
@@ -117,12 +131,16 @@ def get_case(
         return error_response(404, "案件不存在")
 
     # 权限检查
-    if current_user.role != "admin":
+    if current_user.role == "super_admin":
+        # 超级管理员可以访问所有案件
+        pass
+    else:
+        # admin 和 user 都需要检查案件权限
         if not check_case_permission(db, current_user.id, case_id, "read"):
             return error_response(403, "权限不足，无法访问该案件")
 
     # 获取用户权限级别
-    if current_user.role == "admin":
+    if current_user.role == "super_admin":
         user_permission = "admin"
     else:
         user_permission = get_case_permission_level(db, current_user.id, case_id)
@@ -157,7 +175,7 @@ def create_case(
     - 自动给创建者分配admin权限
     """
     # 权限检查
-    if current_user.role != "admin":
+    if current_user.role not in ["super_admin", "admin"]:
         return error_response(403, "权限不足，需要管理员权限")
 
     # 如果没有提供案件编号，自动生成
@@ -243,7 +261,11 @@ def update_case(
         return error_response(404, "案件不存在")
 
     # 权限检查
-    if current_user.role != "admin":
+    if current_user.role == "super_admin":
+        # 超级管理员可以更新所有案件
+        pass
+    else:
+        # admin 和 user 都需要有该案件的管理权限
         if not check_case_permission(db, current_user.id, case_id, "admin"):
             return error_response(403, "权限不足，需要该案件的管理权限")
 
@@ -294,13 +316,14 @@ def delete_case(
 ):
     """
     删除案件（软删除）
-    - 仅系统管理员可删除
+    - super_admin 可以删除任何案件
+    - admin 只能软删除自己创建的案件
     - 需要确认参数 confirm=true
     - 软删除后可以恢复
     - 不会删除案件数据库
     """
     # 权限检查
-    if current_user.role != "admin":
+    if current_user.role not in ["super_admin", "admin"]:
         return error_response(403, "权限不足，需要管理员权限")
 
     # 确认检查
@@ -315,6 +338,11 @@ def delete_case(
     # 检查是否已删除
     if case.is_deleted:
         return error_response(400, "案件已被删除")
+
+    # admin 只能删除自己创建的案件
+    if current_user.role == "admin":
+        if case.created_by != current_user.id:
+            return error_response(403, "权限不足，只能删除自己创建的案件")
 
     try:
         # 软删除：标记为已删除
@@ -354,7 +382,11 @@ def archive_case(
         return error_response(404, "案件不存在")
 
     # 权限检查
-    if current_user.role != "admin":
+    if current_user.role == "super_admin":
+        # 超级管理员可以归档所有案件
+        pass
+    else:
+        # admin 和 user 都需要有该案件的管理权限
         if not check_case_permission(db, current_user.id, case_id, "admin"):
             return error_response(403, "权限不足，需要该案件的管理权限")
 
@@ -378,7 +410,7 @@ def get_deleted_cases(
     - 仅管理员可查看
     """
     # 权限检查
-    if current_user.role != "admin":
+    if current_user.role not in ["super_admin", "admin"]:
         return error_response(403, "权限不足，需要管理员权限")
 
     # 构建查询（只查询已删除的案件）
@@ -434,10 +466,11 @@ def restore_case(
 ):
     """
     恢复已删除案件
-    - 仅系统管理员可恢复
+    - super_admin 可以恢复任何案件
+    - admin 只能恢复自己删除的案件
     """
     # 权限检查
-    if current_user.role != "admin":
+    if current_user.role not in ["super_admin", "admin"]:
         return error_response(403, "权限不足，需要管理员权限")
 
     # 查询案件
@@ -448,6 +481,11 @@ def restore_case(
     # 检查是否已删除
     if not case.is_deleted:
         return error_response(400, "案件未被删除，无需恢复")
+
+    # admin 只能恢复自己删除的案件
+    if current_user.role == "admin":
+        if case.deleted_by != current_user.id:
+            return error_response(403, "权限不足，只能恢复自己删除的案件")
 
     try:
         # 恢复：清除删除标记
@@ -481,15 +519,15 @@ def permanent_delete_case(
 ):
     """
     永久删除案件（硬删除）
-    - 仅系统管理员可操作
+    - 仅 super_admin 可操作
     - 需要确认参数 confirm=true
     - 删除案件记录和相关权限
     - 删除案件数据库
     - 此操作不可恢复
     """
-    # 权限检查
-    if current_user.role != "admin":
-        return error_response(403, "权限不足，需要管理员权限")
+    # 权限检查 - 只有 super_admin 可以永久删除
+    if current_user.role != "super_admin":
+        return error_response(403, "权限不足，需要超级管理员权限")
 
     # 确认检查
     if not confirm:

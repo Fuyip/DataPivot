@@ -229,11 +229,11 @@ def require_case_permission(required_level: str = "read"):
         current_user = Depends(get_current_active_user),
         db: Session = Depends(get_system_db)
     ):
-        # 系统管理员拥有所有权限
-        if current_user.role == "admin":
+        # super_admin 拥有所有权限
+        if current_user.role == "super_admin":
             return current_user
 
-        # 检查用户是否有指定权限
+        # admin 和 user 都需要检查具体的案件权限
         has_permission = check_case_permission(db, current_user.id, case_id, required_level)
         if not has_permission:
             raise HTTPException(status_code=403, detail="权限不足，无法访问该案件")

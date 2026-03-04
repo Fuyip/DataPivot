@@ -8,7 +8,7 @@
       </template>
       <div class="welcome-content">
         <h2>您好，{{ user?.full_name || user?.username }}！</h2>
-        <p>当前角色：{{ user?.role === 'admin' ? '管理员' : '普通用户' }}</p>
+        <p>当前角色：{{ getRoleLabel(user?.role) }}</p>
       </div>
     </el-card>
 
@@ -50,6 +50,15 @@ import { useAuthStore } from '@/stores/auth'
 
 const authStore = useAuthStore()
 const user = computed(() => authStore.user)
+
+function getRoleLabel(role) {
+  const roleMap = {
+    'super_admin': '超级管理员',
+    'admin': '管理员',
+    'user': '普通用户'
+  }
+  return roleMap[role] || '未知角色'
+}
 </script>
 
 <style scoped lang="scss">
