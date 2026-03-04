@@ -1,0 +1,275 @@
+{
+  "Version": 1.1,
+  "General": {
+    "CloudInstanceName": "",
+    "Project": "",
+    "ProjectOwnerNavicatID": "",
+    "Server": "gk",
+    "Host": "10.8.0.5",
+    "Catalog": "",
+    "Schema": "3003xpj",
+    "Comment": "",
+    "ServerType": "MYSQL",
+    "SpecifiedFileName": "",
+    "IsLockTable": false,
+    "UseSingleTransaction": false,
+    "UseSpecifiedFileName": false
+  },
+  "Tables": {
+    "SelectAll": false,
+    "Selected": [
+      {
+        "Name": "29-qq好友",
+        "ObjectType": "Table_MYSQL"
+      },
+      {
+        "Name": "29-微信好友",
+        "ObjectType": "Table_MYSQL"
+      },
+      {
+        "Name": "ali_ip_loc",
+        "ObjectType": "Table_MYSQL"
+      },
+      {
+        "Name": "card_to_sys_logs",
+        "ObjectType": "Table_MYSQL"
+      },
+      {
+        "Name": "case_card",
+        "ObjectType": "Table_MYSQL"
+      },
+      {
+        "Name": "case_card_cant_add",
+        "ObjectType": "Table_MYSQL"
+      },
+      {
+        "Name": "case_card_dz",
+        "ObjectType": "Table_MYSQL"
+      },
+      {
+        "Name": "case_card_tmp",
+        "ObjectType": "Table_MYSQL"
+      },
+      {
+        "Name": "freeze_back",
+        "ObjectType": "Table_MYSQL"
+      },
+      {
+        "Name": "freeze_card",
+        "ObjectType": "Table_MYSQL"
+      },
+      {
+        "Name": "gz_info",
+        "ObjectType": "Table_MYSQL"
+      },
+      {
+        "Name": "gz_tz_info",
+        "ObjectType": "Table_MYSQL"
+      },
+      {
+        "Name": "id_exg_zh",
+        "ObjectType": "Table_MYSQL"
+      },
+      {
+        "Name": "involved_bankcard_details",
+        "ObjectType": "Table_MYSQL"
+      },
+      {
+        "Name": "pinyin_turn",
+        "ObjectType": "Table_MYSQL"
+      },
+      {
+        "Name": "tg-外号",
+        "ObjectType": "Table_MYSQL"
+      },
+      {
+        "Name": "tg_messages",
+        "ObjectType": "Table_MYSQL"
+      },
+      {
+        "Name": "ym-卡码关联情况",
+        "ObjectType": "Table_MYSQL"
+      },
+      {
+        "Name": "ym-历史连接wi-fi",
+        "ObjectType": "Table_MYSQL"
+      },
+      {
+        "Name": "ym-常连wi-fi",
+        "ObjectType": "Table_MYSQL"
+      },
+      {
+        "Name": "ym-本机历史汇报情况",
+        "ObjectType": "Table_MYSQL"
+      },
+      {
+        "Name": "ym-查询路径",
+        "ObjectType": "Table_MYSQL"
+      },
+      {
+        "Name": "ym-行为习惯",
+        "ObjectType": "Table_MYSQL"
+      },
+      {
+        "Name": "ym-设备信息",
+        "ObjectType": "Table_MYSQL"
+      },
+      {
+        "Name": "ym-设备画像",
+        "ObjectType": "Table_MYSQL"
+      },
+      {
+        "Name": "ym-路由设备",
+        "ObjectType": "Table_MYSQL"
+      },
+      {
+        "Name": "zh-汇总查询",
+        "ObjectType": "Table_MYSQL"
+      },
+      {
+        "Name": "云搜综合分析",
+        "ObjectType": "Table_MYSQL"
+      },
+      {
+        "Name": "人员微信号",
+        "ObjectType": "Table_MYSQL"
+      },
+      {
+        "Name": "人员总体归纳",
+        "ObjectType": "Table_MYSQL"
+      },
+      {
+        "Name": "人员电子档案",
+        "ObjectType": "Table_MYSQL"
+      },
+      {
+        "Name": "存现",
+        "ObjectType": "Table_MYSQL"
+      },
+      {
+        "Name": "手机号匹配归属",
+        "ObjectType": "Table_MYSQL"
+      },
+      {
+        "Name": "档案_全国机动车",
+        "ObjectType": "Table_MYSQL"
+      },
+      {
+        "Name": "档案_全国驾驶人",
+        "ObjectType": "Table_MYSQL"
+      },
+      {
+        "Name": "档案_全部轨迹",
+        "ObjectType": "Table_MYSQL"
+      },
+      {
+        "Name": "档案_出入境记录",
+        "ObjectType": "Table_MYSQL"
+      },
+      {
+        "Name": "档案_出入境证件",
+        "ObjectType": "Table_MYSQL"
+      },
+      {
+        "Name": "档案_在逃人员撤销",
+        "ObjectType": "Table_MYSQL"
+      },
+      {
+        "Name": "档案_失信被执行人员",
+        "ObjectType": "Table_MYSQL"
+      },
+      {
+        "Name": "档案_婚姻信息",
+        "ObjectType": "Table_MYSQL"
+      },
+      {
+        "Name": "档案_旅客住宿信息",
+        "ObjectType": "Table_MYSQL"
+      },
+      {
+        "Name": "档案_最高学历学位",
+        "ObjectType": "Table_MYSQL"
+      },
+      {
+        "Name": "档案_机动车违章",
+        "ObjectType": "Table_MYSQL"
+      },
+      {
+        "Name": "档案_机构法人信息",
+        "ObjectType": "Table_MYSQL"
+      },
+      {
+        "Name": "档案_民航离港记录",
+        "ObjectType": "Table_MYSQL"
+      },
+      {
+        "Name": "档案_民航订票记录",
+        "ObjectType": "Table_MYSQL"
+      },
+      {
+        "Name": "档案_监所管理违法犯罪人员",
+        "ObjectType": "Table_MYSQL"
+      },
+      {
+        "Name": "档案_铁路售票信息",
+        "ObjectType": "Table_MYSQL"
+      },
+      {
+        "Name": "档案_银行核查信息",
+        "ObjectType": "Table_MYSQL"
+      },
+      {
+        "Name": "签证表",
+        "ObjectType": "Table_MYSQL"
+      },
+      {
+        "Name": "管理_出入境信息",
+        "ObjectType": "Table_MYSQL"
+      },
+      {
+        "Name": "跑分人员总表",
+        "ObjectType": "Table_MYSQL"
+      },
+      {
+        "Name": "跑分团伙身份证",
+        "ObjectType": "Table_MYSQL"
+      },
+      {
+        "Name": "锋刃虚拟身份",
+        "ObjectType": "Table_MYSQL"
+      },
+      {
+        "Name": "预冻结卡境外ip",
+        "ObjectType": "Table_MYSQL"
+      }
+    ]
+  },
+  "Views": {
+    "SelectAll": true,
+    "Selected": []
+  },
+  "Functions": {
+    "SelectAll": true,
+    "Selected": []
+  },
+  "Events": {
+    "SelectAll": true,
+    "Selected": []
+  },
+  "Sequences": {
+    "SelectAll": true,
+    "Selected": []
+  },
+  "Types": {
+    "SelectAll": true,
+    "Selected": []
+  },
+  "Indexes": {
+    "SelectAll": true,
+    "Selected": []
+  },
+  "Triggers": {
+    "SelectAll": true,
+    "Selected": []
+  }
+}
