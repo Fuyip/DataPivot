@@ -204,7 +204,7 @@ def create_case(
     db.flush()  # 获取案件ID
 
     try:
-        # 创建案件数据库
+        # 创建案件数据库（仅创建空数据库）
         database_name = create_case_database(new_case.id, new_case.case_name, new_case.case_code)
         new_case.database_name = database_name
 
@@ -220,6 +220,10 @@ def create_case(
         db.commit()
         db.refresh(new_case)
 
+        # 异步初始化表结构
+        from backend.tasks.case_tasks import initialize_case_database_task
+        initialize_case_database_task.delay(database_name, new_case.case_code)
+
         return success_response(
             data={
                 "id": new_case.id,
@@ -231,7 +235,7 @@ def create_case(
                 "created_by": new_case.created_by,
                 "created_at": new_case.created_at.isoformat() if new_case.created_at else None
             },
-            message="案件创建成功"
+            message="案件创建成功，数据库表结构正在后台初始化"
         )
     except Exception as e:
         db.rollback()

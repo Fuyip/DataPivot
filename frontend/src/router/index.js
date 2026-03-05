@@ -39,6 +39,25 @@ const routes = [
           icon: 'FolderOpened',
           requiresAdmin: true
         }
+      },
+      {
+        path: 'system/bank-statements',
+        name: 'BankStatement',
+        component: () => import('@/views/System/BankStatement/index.vue'),
+        meta: {
+          title: '银行流水上传',
+          icon: 'Upload'
+        }
+      },
+      {
+        path: 'system/import-rules',
+        name: 'ImportRuleManagement',
+        component: () => import('@/views/System/ImportRuleManagement/index.vue'),
+        meta: {
+          title: '导入规则管理',
+          icon: 'Setting',
+          requiresAdmin: true
+        }
       }
     ]
   }

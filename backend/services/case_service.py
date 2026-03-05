@@ -6,6 +6,8 @@ import time
 import random
 import string
 import re
+import os
+import logging
 from typing import Optional, List
 from sqlalchemy.orm import Session
 from sqlalchemy import create_engine, text
@@ -16,6 +18,13 @@ from urllib.parse import quote_plus
 from backend.models.case import Case, UserCasePermission
 from backend.services.auth_service import get_current_active_user
 from database import get_system_db
+
+# 配置日志
+logger = logging.getLogger(__name__)
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
 
 
 def generate_case_code(db: Session) -> str:
@@ -61,9 +70,197 @@ def sanitize_database_name(name: str) -> str:
     return sanitized
 
 
+def initialize_case_database_schema(database_name: str, case_code: str):
+    """
+    初始化案件数据库表结构（从 fx_test 模板导入）
+
+    Args:
+        database_name: 数据库名称
+        case_code: 案件编号
+
+    Raises:
+        Exception: 当模板文件不存在或SQL执行失败时
+    """
+    logger.info(f"开始初始化案件数据库: {database_name}, 案件编号: {case_code}")
+
+    # 获取案件数据库模板文件路径
+    template_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
+                                  'sql', 'schema', 'case_template.sql')
+
+    if not os.path.exists(template_path):
+        error_msg = f"案件数据库模板文件不存在: {template_path}"
+        logger.error(error_msg)
+        raise Exception(error_msg)
+
+    logger.info(f"读取模板文件: {template_path}")
+
+    # 读取模板 SQL 文件
+    try:
+        with open(template_path, 'r', encoding='utf-8') as f:
+            sql_content = f.read()
+        logger.info(f"模板文件读取成功，大小: {len(sql_content)} 字节")
+    except Exception as e:
+        error_msg = f"读取模板文件失败: {str(e)}"
+        logger.error(error_msg)
+        raise Exception(error_msg)
+
+    # 替换案件编号占位符
+    sql_content = sql_content.replace('{{CASE_CODE}}', case_code)
+    logger.info(f"已替换案件编号占位符: {{{{CASE_CODE}}}} -> {case_code}")
+
+    # 创建数据库连接
+    encoded_password = quote_plus(config.MYSQL_PASSWORD)
+    db_url = f"mysql+pymysql://{config.MYSQL_USER}:{encoded_password}@{config.MYSQL_HOST}:{config.MYSQL_PORT}/{database_name}?charset=utf8mb4"
+
+    engine = create_engine(db_url)
+
+    executed_count = 0
+    failed_count = 0
+    failed_statements = []
+
+    try:
+        with engine.connect() as conn:
+            # 分割 SQL 语句（按分号分割）
+            statements = sql_content.split(';')
+            total_statements = len([s for s in statements if s.strip() and not s.strip().startswith('--')])
+
+            logger.info(f"开始执行 SQL 语句，共 {total_statements} 条")
+
+            for idx, statement in enumerate(statements):
+                statement = statement.strip()
+                if statement and not statement.startswith('--'):
+                    try:
+                        conn.execute(text(statement))
+                        conn.commit()
+                        executed_count += 1
+
+                        # 每执行10条语句记录一次进度
+                        if executed_count % 10 == 0:
+                            logger.info(f"进度: {executed_count}/{total_statements} 条语句已执行")
+
+                    except Exception as e:
+                        # 忽略某些无关紧要的错误（如 SET 语句）
+                        if 'SET' not in statement.upper():
+                            failed_count += 1
+                            error_info = {
+                                'index': idx,
+                                'error': str(e)[:200],
+                                'statement': statement[:200]
+                            }
+                            failed_statements.append(error_info)
+                            logger.error(f"执行 SQL 语句失败 (第 {idx} 条): {str(e)[:100]}")
+                            logger.error(f"失败的语句: {statement[:200]}")
+
+                            # 如果是创建表的语句失败，这是严重错误
+                            if 'CREATE TABLE' in statement.upper():
+                                logger.error(f"创建表失败，这是严重错误！")
+                                # 继续执行，但记录错误
+
+            logger.info(f"SQL 执行完成: 成功 {executed_count} 条, 失败 {failed_count} 条")
+
+            if failed_count > 0:
+                logger.warning(f"有 {failed_count} 条语句执行失败，详情:")
+                for fail in failed_statements[:5]:  # 只记录前5个失败
+                    logger.warning(f"  - 第 {fail['index']} 条: {fail['error']}")
+
+    except Exception as e:
+        error_msg = f"初始化数据库时发生严重错误: {str(e)}"
+        logger.error(error_msg)
+        raise Exception(error_msg)
+    finally:
+        engine.dispose()
+
+    logger.info(f"案件数据库 {database_name} 初始化完成")
+
+    # 验证关键表是否创建成功
+    try:
+        verify_result = verify_case_database_tables(database_name)
+        if verify_result['missing_tables']:
+            logger.warning(f"警告: 以下关键表缺失: {', '.join(verify_result['missing_tables'])}")
+        else:
+            logger.info("所有关键表验证通过")
+    except Exception as e:
+        logger.warning(f"表验证失败: {str(e)}")
+
+
+def verify_case_database_tables(database_name: str) -> dict:
+    """
+    验证案件数据库关键表是否存在
+
+    Args:
+        database_name: 数据库名称
+
+    Returns:
+        dict: 包含验证结果的字典
+            {
+                'total_tables': int,  # 总表数
+                'required_tables': list,  # 必需的表列表
+                'existing_tables': list,  # 已存在的表列表
+                'missing_tables': list,  # 缺失的表列表
+                'all_present': bool  # 是否所有必需表都存在
+            }
+    """
+    logger.info(f"开始验证数据库 {database_name} 的表结构")
+
+    # 定义必需的关键表
+    required_tables = [
+        'bank_all_statements',
+        'bank_all_statements_tmp',
+        'bank_all_statements_lastest',
+        'bank_all_statements_turn',
+        'bank_all_statements_with_info',
+        'bank_account_info',
+        'bank_people_info',
+        'case_card'
+    ]
+
+    encoded_password = quote_plus(config.MYSQL_PASSWORD)
+    db_url = f"mysql+pymysql://{config.MYSQL_USER}:{encoded_password}@{config.MYSQL_HOST}:{config.MYSQL_PORT}/{database_name}?charset=utf8mb4"
+
+    engine = create_engine(db_url)
+
+    try:
+        with engine.connect() as conn:
+            # 获取所有表
+            result = conn.execute(text("SHOW TABLES"))
+            all_tables = [row[0] for row in result.fetchall()]
+
+            # 检查必需表
+            existing_tables = []
+            missing_tables = []
+
+            for table in required_tables:
+                if table in all_tables:
+                    existing_tables.append(table)
+                else:
+                    missing_tables.append(table)
+
+            result = {
+                'total_tables': len(all_tables),
+                'required_tables': required_tables,
+                'existing_tables': existing_tables,
+                'missing_tables': missing_tables,
+                'all_present': len(missing_tables) == 0
+            }
+
+            logger.info(f"验证完成: 总表数 {len(all_tables)}, 必需表 {len(required_tables)}, "
+                       f"已存在 {len(existing_tables)}, 缺失 {len(missing_tables)}")
+
+            if missing_tables:
+                logger.warning(f"缺失的表: {', '.join(missing_tables)}")
+
+            return result
+
+    except Exception as e:
+        logger.error(f"验证数据库表时出错: {str(e)}")
+        raise
+    finally:
+        engine.dispose()
+
+
 def create_case_database(case_id: int, case_name: str, case_code: str) -> str:
     """
-    为案件创建独立的数据库
+    为案件创建独立的数据库（仅创建空数据库，不初始化表结构）
 
     Args:
         case_id: 案件ID
@@ -96,6 +293,9 @@ def create_case_database(case_id: int, case_name: str, case_code: str) -> str:
             # 创建数据库
             conn.execute(text(f"CREATE DATABASE `{database_name}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci"))
             conn.commit()
+
+    except Exception as e:
+        raise e
     finally:
         engine.dispose()
 

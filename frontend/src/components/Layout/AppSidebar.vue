@@ -16,6 +16,11 @@
         <span>仪表盘</span>
       </el-menu-item>
 
+      <el-menu-item index="/system/bank-statements">
+        <el-icon><Upload /></el-icon>
+        <span>银行流水上传</span>
+      </el-menu-item>
+
       <el-sub-menu index="system" v-if="isAdmin">
         <template #title>
           <el-icon><Setting /></el-icon>
@@ -28,6 +33,10 @@
         <el-menu-item index="/system/cases">
           <el-icon><FolderOpened /></el-icon>
           <span>案件管理</span>
+        </el-menu-item>
+        <el-menu-item index="/system/import-rules">
+          <el-icon><Setting /></el-icon>
+          <span>导入规则管理</span>
         </el-menu-item>
       </el-sub-menu>
     </el-menu>

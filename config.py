@@ -1,7 +1,19 @@
 from urllib.parse import quote_plus
+from pathlib import Path
 
 from anyio.functools import lru_cache
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+# 获取项目根目录
+def get_project_root() -> Path:
+    """获取项目根目录（包含 .env 文件的目录）"""
+    current = Path(__file__).resolve().parent
+    # 如果当前目录有 .env 文件，就是根目录
+    if (current / '.env').exists():
+        return current
+    # 否则返回当前目录（假设 .env 在同一目录）
+    return current
 
 
 class Settings(BaseSettings):
@@ -22,8 +34,15 @@ class Settings(BaseSettings):
     # CORS 配置
     CORS_ORIGINS: str = "http://localhost:5173,http://localhost:3000"
 
-    class Config:
-        env_file = ('.env','.env.prod')
+    # Redis 配置
+    REDIS_HOST: str = "localhost"
+    REDIS_PORT: int = 6379
+
+    model_config = SettingsConfigDict(
+        env_file=str(get_project_root() / '.env'),
+        env_file_encoding='utf-8',
+        case_sensitive=False
+    )
 
 @lru_cache()
 def get_settings() -> Settings:

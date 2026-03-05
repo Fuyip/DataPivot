@@ -31,6 +31,11 @@ request.interceptors.request.use(
 // 响应拦截器
 request.interceptors.response.use(
   response => {
+    // 如果是 blob 类型响应（文件下载），直接返回
+    if (response.config.responseType === 'blob') {
+      return response.data
+    }
+
     const { code, message, data } = response.data
 
     // 后端统一返回格式：{code, message, data}

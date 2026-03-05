@@ -1,0 +1,2018 @@
+-- fx_test 数据库结构
+-- 生成时间: 2026-03-04 21:44:39
+-- 数据库: fx_test
+-- 主机: 10.8.0.5:3306
+
+-- 说明: 此文件为案件数据库的标准结构模板
+-- 所有新建案件数据库都应使用此结构
+
+SET NAMES utf8mb4;
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- ----------------------------
+-- 表结构 (共 76 个)
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for 29-qq好友
+-- ----------------------------
+DROP TABLE IF EXISTS `29-qq好友`;
+CREATE TABLE `29-qq好友` (
+  `姓名` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `身份证` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `主体qq号` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `qq好友号码` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `好友备注` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `好友分组` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `好友手机号` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for 29-微信好友
+-- ----------------------------
+DROP TABLE IF EXISTS `29-微信好友`;
+CREATE TABLE `29-微信好友` (
+  `主体微信号` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `好友类型` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `好友微信号` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `好友id` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `微信群号` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `好友备注` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `添加好友来源` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `信息来源` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for apply_card_inner
+-- ----------------------------
+DROP TABLE IF EXISTS `apply_card_inner`;
+CREATE TABLE `apply_card_inner` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键，自增',
+  `case_no` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT '3003xpj' COMMENT '案件编号',
+  `card_no` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '卡号',
+  `bank_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '银行名称',
+  `source` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '来源',
+  `apply_people` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '申请人',
+  `apply_date` datetime DEFAULT NULL COMMENT '申请日期',
+  `reason` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '申调原因',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `IDX_apply_card_inner_card_no` (`card_no`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=159695 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for bank_account_info
+-- ----------------------------
+DROP TABLE IF EXISTS `bank_account_info`;
+CREATE TABLE `bank_account_info` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键，自增',
+  `case_no` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '案件编号',
+  `source` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '数据来源',
+  `accountOpeningName` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '账户开户名称',
+  `idNum` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '开户人证件号码',
+  `transactionCardNum` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '交易卡号',
+  `tradingAccountNum` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '交易账号',
+  `accountOpeningTime` date DEFAULT NULL COMMENT '账号开户时间',
+  `accountBalance` float DEFAULT NULL COMMENT '账户余额',
+  `availableBalance` float DEFAULT NULL COMMENT '可用余额',
+  `currency` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '币种',
+  `accountOpeningOutletCode` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '开户网点代码',
+  `accountOpeningOutlets` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '开户网点',
+  `accountStatus` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '账户状态',
+  `banknoteLogo` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '炒汇标志名称',
+  `accountClosureDate` date DEFAULT NULL COMMENT '销户日期',
+  `accountType` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '账户类型',
+  `remark` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci COMMENT '备注',
+  `accountOpeningBank` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '账号开户银行',
+  `closureOutlets` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '账户销户银行',
+  `lastTradingTime` datetime DEFAULT NULL COMMENT '最后交易时间',
+  `fail_reason` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '失败原因',
+  `contactInformation` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '联系方式',
+  `mailAddress` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '邮寄地址',
+  `contactNum` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '联系电话',
+  `agent` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '代理人',
+  `phoneNumber` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '手机号码',
+  `openingProvince` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '开户省份',
+  `openingCity` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '开户城市',
+  `customerCode` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '客户编码',
+  `legalRepresentative` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '法定代表人',
+  `CustomersBusinessLicenseNumber` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '营业执照号码',
+  `legalRepresentativeIdNum` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '法定代表人证件号码',
+  `ResidentialAddress` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '居住地址',
+  `PostalCode` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '邮政编码',
+  `agentId` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '代理人ID',
+  `emailAddress` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '电子邮箱',
+  `fundAccount` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '资金账户',
+  `localTaxPaymentNum` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '地税缴纳号',
+  `workPhone` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '工作电话',
+  `agentIdType` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '代理人证件类型',
+  `HomePhone` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '家庭电话',
+  `legalRepresentativeIdtype` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '法定代表人证件类型',
+  `nationalTaxpaymentNum` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '国税缴纳号',
+  `workLocation` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '工作地点',
+  `workUnit` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '工作单位',
+  `ClosingBranch` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '销户分行',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `idx_u` (`accountOpeningName`,`idNum`,`transactionCardNum`,`tradingAccountNum`) USING BTREE,
+  KEY `IDX_bank_account_info_transactionCardNum` (`transactionCardNum`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=136499 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for bank_account_info_copy1
+-- ----------------------------
+DROP TABLE IF EXISTS `bank_account_info_copy1`;
+CREATE TABLE `bank_account_info_copy1` (
+  `id` bigint DEFAULT NULL COMMENT '主键，自增',
+  `case_no` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '案件编号',
+  `source` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '数据来源',
+  `accountOpeningName` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '账户开户名称',
+  `idNum` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '开户人证件号码',
+  `transactionCardNum` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '交易卡号',
+  `tradingAccountNum` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '交易账号',
+  `accountOpeningTime` date DEFAULT NULL COMMENT '账号开户时间',
+  `accountBalance` float DEFAULT NULL COMMENT '账户余额',
+  `availableBalance` float DEFAULT NULL COMMENT '可用余额',
+  `currency` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '币种',
+  `accountOpeningOutletCode` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '开户网点代码',
+  `accountOpeningOutlets` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '开户网点',
+  `accountStatus` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '账户状态',
+  `banknoteLogo` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '炒汇标志名称',
+  `accountClosureDate` date DEFAULT NULL COMMENT '销户日期',
+  `accountType` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '账户类型',
+  `remark` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci COMMENT '备注',
+  `accountOpeningBank` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '账号开户银行',
+  `closureOutlets` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '账户销户银行',
+  `lastTradingTime` datetime DEFAULT NULL COMMENT '最后交易时间',
+  `fail_reason` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '失败原因',
+  `contactInformation` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '联系方式',
+  `mailAddress` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '邮寄地址',
+  `contactNum` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '联系电话',
+  `agent` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '代理人',
+  `phoneNumber` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '手机号码',
+  `openingProvince` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '开户省份',
+  `openingCity` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '开户城市',
+  `customerCode` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '客户编码',
+  `legalRepresentative` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '法定代表人',
+  `CustomersBusinessLicenseNumber` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '营业执照号码',
+  `legalRepresentativeIdNum` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '法定代表人证件号码',
+  `ResidentialAddress` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '居住地址',
+  `PostalCode` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '邮政编码',
+  `agentId` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '代理人ID',
+  `emailAddress` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '电子邮箱',
+  `fundAccount` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '资金账户',
+  `localTaxPaymentNum` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '地税缴纳号',
+  `workPhone` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '工作电话',
+  `agentIdType` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '代理人证件类型',
+  `HomePhone` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '家庭电话',
+  `legalRepresentativeIdtype` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '法定代表人证件类型',
+  `nationalTaxpaymentNum` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '国税缴纳号',
+  `workLocation` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '工作地点',
+  `workUnit` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '工作单位',
+  `ClosingBranch` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '销户分行',
+  UNIQUE KEY `idx_u` (`accountOpeningName`,`idNum`,`transactionCardNum`,`tradingAccountNum`) USING BTREE,
+  KEY `IDX_bank_account_info_transactionCardNum` (`transactionCardNum`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for bank_account_info_tmp
+-- ----------------------------
+DROP TABLE IF EXISTS `bank_account_info_tmp`;
+CREATE TABLE `bank_account_info_tmp` (
+  `id` int DEFAULT '0' COMMENT 'ID',
+  `case_no` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '案件编号',
+  `source` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '数据来源',
+  `accountOpeningName` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '账户开户名称',
+  `idNum` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '开户人证件号码',
+  `transactionCardNum` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '交易卡号',
+  `tradingAccountNum` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '交易账号',
+  `accountOpeningTime` date DEFAULT NULL COMMENT '账号开户时间',
+  `accountBalance` float DEFAULT NULL COMMENT '账户余额',
+  `availableBalance` float DEFAULT NULL COMMENT '可用余额',
+  `currency` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '币种',
+  `accountOpeningOutletCode` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '开户网点代码',
+  `accountOpeningOutlets` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '开户网点',
+  `accountStatus` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '账户状态',
+  `banknoteLogo` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '炒汇标志名称',
+  `accountClosureDate` date DEFAULT NULL COMMENT '销户日期',
+  `accountType` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '账户类型',
+  `remark` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci COMMENT '备注',
+  `accountOpeningBank` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '账号开户银行',
+  `closureOutlets` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '账户销户银行',
+  `lastTradingTime` datetime DEFAULT NULL COMMENT '最后交易时间',
+  `fail_reason` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '失败原因',
+  `contactInformation` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '联系方式',
+  `mailAddress` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '邮寄地址',
+  `contactNum` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '联系电话',
+  `agent` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '代理人',
+  `phoneNumber` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '手机号码',
+  `openingProvince` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '开户省份',
+  `openingCity` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '开户城市',
+  `customerCode` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '客户编码',
+  `legalRepresentative` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '法定代表人',
+  `CustomersBusinessLicenseNumber` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '营业执照号码',
+  `legalRepresentativeIdNum` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '法定代表人证件号码',
+  `ResidentialAddress` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '居住地址',
+  `PostalCode` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '邮政编码',
+  `agentId` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '代理人ID',
+  `emailAddress` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '电子邮箱',
+  `fundAccount` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '资金账户',
+  `localTaxPaymentNum` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '地税缴纳号',
+  `workPhone` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '工作电话',
+  `agentIdType` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '代理人证件类型',
+  `HomePhone` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '家庭电话',
+  `legalRepresentativeIdtype` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '法定代表人证件类型',
+  `nationalTaxpaymentNum` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '国税缴纳号',
+  `workLocation` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '工作地点',
+  `workUnit` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '工作单位',
+  `ClosingBranch` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '销户分行',
+  KEY `IDX_bank_account_info_tmp_transactionCardNum` (`transactionCardNum`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for bank_all_rival_bank_name
+-- ----------------------------
+DROP TABLE IF EXISTS `bank_all_rival_bank_name`;
+CREATE TABLE `bank_all_rival_bank_name` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `rival_card_no` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '交易对手账卡号',
+  `rival_card_banks` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `rival_card_no` (`rival_card_no`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=7623333 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for bank_all_statements
+-- ----------------------------
+DROP TABLE IF EXISTS `bank_all_statements`;
+CREATE TABLE `bank_all_statements` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键，自增',
+  `case_no` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '案件编号',
+  `card_no` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '交易卡号',
+  `card_account` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '交易账号',
+  `account_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '账户名称',
+  `trade_date` datetime DEFAULT NULL COMMENT '交易时间',
+  `trade_money` double DEFAULT NULL COMMENT '交易金额',
+  `trade_balance` double DEFAULT NULL COMMENT '交易余额',
+  `dict_trade_tag` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '收付标志',
+  `rival_card_no` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '交易对手账卡号',
+  `cash_sign` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '现金标志',
+  `rival_card_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '对手户名',
+  `rival_card_id_no` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '对手身份证号',
+  `rival_card_bank_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '对手开户银行',
+  `summary_description` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '摘要说明',
+  `transaction_currency` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '交易币种',
+  `transaction_outlet_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '交易网点名称',
+  `transaction_loc` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '交易发生地',
+  `is_transaction_v` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '交易是否成功',
+  `subpoena_num` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '传票号',
+  `ip_loc` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT 'IP地址',
+  `mac_loc` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT 'MAC地址',
+  `rival_trade_balance` double CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '对手交易余额',
+  `transaction_serial_num` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '交易流水号',
+  `log_num` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '日志号',
+  `credential_type` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '凭证种类',
+  `voucher_num` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '凭证号',
+  `transaction_teller_num` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '交易柜员号',
+  `remark` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '备注',
+  `merchant_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '商户名称',
+  `merchant_code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '商户代码',
+  `transaction_type` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '交易类型',
+  `result` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci COMMENT '查询反馈结果原因',
+  `lastest` tinyint DEFAULT NULL COMMENT '最新标志',
+  `idNumber` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '身份证号码',
+  `idType` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '证件类型',
+  `is_card_no_change` tinyint DEFAULT NULL COMMENT '是否被修改卡号',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `index_bank_all_statements` (`card_no`,`trade_date` DESC,`trade_money`,`trade_balance`,`dict_trade_tag`,`rival_card_no`) USING BTREE,
+  KEY `IDX_bank_all_statements_card_no` (`card_no`) USING BTREE,
+  KEY `IDX_rival_card_no` (`rival_card_no`) USING BTREE,
+  KEY `dict_trade_tag` (`dict_trade_tag`) USING BTREE,
+  KEY `rival_card_name` (`rival_card_name`) USING BTREE,
+  KEY `summary_description` (`summary_description`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=279237035 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for bank_all_statements_cash_info
+-- ----------------------------
+DROP TABLE IF EXISTS `bank_all_statements_cash_info`;
+CREATE TABLE `bank_all_statements_cash_info` (
+  `账户信息户名` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `身份证号码` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `涉案银行卡类型` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `银行卡号` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '交易卡号',
+  `交易时间` datetime DEFAULT NULL COMMENT '交易时间',
+  `交易金额` double DEFAULT NULL COMMENT '交易金额',
+  `交易余额` double DEFAULT NULL COMMENT '交易余额',
+  `交易标识` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '收付标志',
+  `交易对手卡号` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '交易对手账卡号',
+  `交易对手名称` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '对手户名',
+  `摘要` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '摘要说明',
+  `trade_month` varchar(7) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `总出帐流水` double DEFAULT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
+  `id1` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `银行卡号` (`银行卡号`) USING BTREE,
+  KEY `交易金额` (`交易金额`) USING BTREE,
+  KEY `交易时间` (`交易时间`) USING BTREE,
+  KEY `trade_month` (`trade_month`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=8076 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for bank_all_statements_lastest
+-- ----------------------------
+DROP TABLE IF EXISTS `bank_all_statements_lastest`;
+CREATE TABLE `bank_all_statements_lastest` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键，自增',
+  `case_no` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '案件编号',
+  `card_no` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '卡号',
+  `card_account` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '卡账户',
+  `account_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '账户名',
+  `trade_date` datetime DEFAULT NULL COMMENT '交易日期',
+  `trade_money` double DEFAULT NULL COMMENT '交易金额',
+  `trade_balance` double DEFAULT NULL COMMENT '交易余额',
+  `dict_trade_tag` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '交易标签',
+  `rival_card_no` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '对方卡号',
+  `cash_sign` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '现金标记',
+  `rival_card_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '对方卡名',
+  `rival_card_id_no` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '对方身份证号',
+  `rival_card_bank_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '对方银行名称',
+  `summary_description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '摘要说明',
+  `transaction_currency` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '交易币种',
+  `transaction_outlet_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '交易网点名',
+  `transaction_loc` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '交易地点',
+  `is_transaction_v` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '是否交易',
+  `subpoena_num` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '传票编号',
+  `ip_loc` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT 'IP位置',
+  `mac_loc` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT 'MAC位置',
+  `rival_trade_balance` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '对方交易余额',
+  `transaction_serial_num` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '交易序列号',
+  `log_num` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '日志编号',
+  `credential_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '证件类型',
+  `voucher_num` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '凭证编号',
+  `transaction_teller_num` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '交易柜员号',
+  `remark` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '备注',
+  `merchant_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '商户名称',
+  `merchant_code` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '商户代码',
+  `transaction_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '交易类型',
+  `result` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci COMMENT '结果',
+  `lastest` tinyint DEFAULT NULL COMMENT '最新标记',
+  `idNumber` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '身份证号',
+  `idType` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '证件类型',
+  `is_card_no_change` tinyint DEFAULT NULL COMMENT '是否被修改卡号',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `bank_all_statements_lastest` (`card_no`,`trade_date` DESC,`trade_money`,`trade_balance`,`dict_trade_tag`,`rival_card_no`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=279212833 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for bank_all_statements_tmp
+-- ----------------------------
+DROP TABLE IF EXISTS `bank_all_statements_tmp`;
+CREATE TABLE `bank_all_statements_tmp` (
+  `id` int DEFAULT '0' COMMENT 'ID',
+  `case_no` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '案件编号',
+  `card_no` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '交易卡号',
+  `card_account` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '交易账号',
+  `account_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '账户名称',
+  `trade_date` datetime DEFAULT NULL COMMENT '交易时间',
+  `trade_money` double DEFAULT NULL COMMENT '交易金额',
+  `trade_balance` double DEFAULT NULL COMMENT '交易余额',
+  `dict_trade_tag` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '收付标志',
+  `rival_card_no` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '交易对手账卡号',
+  `cash_sign` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '现金标志',
+  `rival_card_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '对手户名',
+  `rival_card_id_no` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '对手身份证号',
+  `rival_card_bank_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '对手开户银行',
+  `summary_description` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '摘要说明',
+  `transaction_currency` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '交易币种',
+  `transaction_outlet_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '交易网点名称',
+  `transaction_loc` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '交易发生地',
+  `is_transaction_v` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '交易是否成功',
+  `subpoena_num` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '传票号',
+  `ip_loc` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT 'IP地址',
+  `mac_loc` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT 'MAC地址',
+  `rival_trade_balance` double CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '对手交易余额',
+  `transaction_serial_num` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '交易流水号',
+  `log_num` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '日志号',
+  `credential_type` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '凭证种类',
+  `voucher_num` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '凭证号',
+  `transaction_teller_num` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '交易柜员号',
+  `remark` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '备注',
+  `merchant_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '商户名称',
+  `merchant_code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '商户代码',
+  `transaction_type` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '交易类型',
+  `result` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci COMMENT '查询反馈结果原因',
+  `lastest` tinyint DEFAULT NULL COMMENT '最新标志',
+  `idNumber` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '身份证号码',
+  `idType` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '证件类型',
+  `is_card_no_change` tinyint DEFAULT NULL COMMENT '是否被修改卡号',
+  KEY `IDX_bank_all_statements_tmp_card_no` (`card_no`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for bank_all_statements_turn
+-- ----------------------------
+DROP TABLE IF EXISTS `bank_all_statements_turn`;
+CREATE TABLE `bank_all_statements_turn` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键，自增',
+  `case_no` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '案件编号',
+  `card_no` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '卡号',
+  `card_account` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '卡账户',
+  `account_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '账户名称',
+  `trade_date` datetime DEFAULT NULL COMMENT '交易日期',
+  `trade_money` double DEFAULT NULL COMMENT '交易金额',
+  `trade_balance` double DEFAULT NULL COMMENT '交易余额',
+  `dict_trade_tag` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '交易标签',
+  `rival_card_no` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '对方卡号',
+  `cash_sign` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '现金标记',
+  `rival_card_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '对方卡名',
+  `rival_card_id_no` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '对方身份证号',
+  `rival_card_bank_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '对方开户行名称',
+  `summary_description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '摘要描述',
+  `transaction_currency` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '交易货币',
+  `transaction_outlet_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '交易网点名称',
+  `transaction_loc` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '交易地点',
+  `is_transaction_v` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '是否交易验证',
+  `subpoena_num` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '传票号码',
+  `ip_loc` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT 'IP 地址位置',
+  `mac_loc` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT 'MAC 地址位置',
+  `rival_trade_balance` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '对方交易余额',
+  `transaction_serial_num` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '交易流水号',
+  `log_num` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '日志编号',
+  `credential_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '证件类型',
+  `voucher_num` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '凭证号码',
+  `transaction_teller_num` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '交易出纳编号',
+  `remark` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '备注',
+  `merchant_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '商户名称',
+  `merchant_code` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '商户代码',
+  `transaction_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '交易类型',
+  `result` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci COMMENT '结果',
+  `lastest` tinyint DEFAULT NULL COMMENT '最新标记',
+  `idNumber` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '身份证号码',
+  `idType` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '身份证类型',
+  `is_card_no_change` tinyint DEFAULT NULL COMMENT '是否被修改卡号',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `UQE_bank_all_statements_turn_card_cardtype` (`card_no`,`trade_date`,`trade_money`,`trade_balance`,`dict_trade_tag`,`rival_card_no`) USING BTREE,
+  KEY `idx_card_no` (`card_no`) USING BTREE,
+  KEY `idx_rival_card_no` (`rival_card_no`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=279196074 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for bank_all_statements_with_info
+-- ----------------------------
+DROP TABLE IF EXISTS `bank_all_statements_with_info`;
+CREATE TABLE `bank_all_statements_with_info` (
+  `id` bigint NOT NULL COMMENT '主键，自增',
+  `case_no` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '案件编号',
+  `card_no` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '交易卡号',
+  `card_account` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '交易账号',
+  `account_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '账户名称',
+  `trade_date` datetime DEFAULT NULL COMMENT '交易时间',
+  `trade_money` double DEFAULT NULL COMMENT '交易金额',
+  `trade_balance` double DEFAULT NULL COMMENT '交易余额',
+  `dict_trade_tag` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '收付标志',
+  `rival_card_no` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '交易对手账卡号',
+  `cash_sign` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '现金标志',
+  `rival_card_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '对手户名',
+  `rival_card_id_no` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '对手身份证号',
+  `rival_card_bank_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '对手开户银行',
+  `summary_description` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '摘要说明',
+  `transaction_currency` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '交易币种',
+  `transaction_outlet_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '交易网点名称',
+  `transaction_loc` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '交易发生地',
+  `is_transaction_v` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '交易是否成功',
+  `subpoena_num` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '传票号',
+  `ip_loc` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT 'IP地址',
+  `mac_loc` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT 'MAC地址',
+  `rival_trade_balance` double CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '对手交易余额',
+  `transaction_serial_num` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '交易流水号',
+  `log_num` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '日志号',
+  `credential_type` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '凭证种类',
+  `voucher_num` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '凭证号',
+  `transaction_teller_num` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '交易柜员号',
+  `remark` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '备注',
+  `merchant_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '商户名称',
+  `merchant_code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '商户代码',
+  `transaction_type` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '交易类型',
+  `result` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci COMMENT '查询反馈结果原因',
+  `lastest` tinyint DEFAULT NULL COMMENT '最新标志',
+  `idNumber` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '身份证号码',
+  `idType` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '证件类型',
+  `is_card_no_change` tinyint DEFAULT NULL COMMENT '是否被修改卡号',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `index_bank_all_statements` (`card_no`,`trade_date` DESC,`trade_money`,`trade_balance`,`dict_trade_tag`,`rival_card_no`) USING BTREE,
+  KEY `IDX_bank_all_statements_card_no` (`card_no`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for bank_apply_fail
+-- ----------------------------
+DROP TABLE IF EXISTS `bank_apply_fail`;
+CREATE TABLE `bank_apply_fail` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `task_serial_number` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `bank_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `main_category` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `certificate_number` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `account_card_number` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `send_time` datetime DEFAULT NULL,
+  `feedback_time` datetime DEFAULT NULL,
+  `feedback_result` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `warehouse_status` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `request_number` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `query_result` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `unq_card_no` (`bank_name`,`account_card_number`,`query_result`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=14044 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for bank_apply_fail_tmp
+-- ----------------------------
+DROP TABLE IF EXISTS `bank_apply_fail_tmp`;
+CREATE TABLE `bank_apply_fail_tmp` (
+  `id` int DEFAULT '0',
+  `task_serial_number` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `bank_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `main_category` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `certificate_number` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `account_card_number` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `send_time` datetime DEFAULT NULL,
+  `feedback_time` datetime DEFAULT NULL,
+  `feedback_result` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `warehouse_status` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `request_number` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `query_result` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for bank_card_exg
+-- ----------------------------
+DROP TABLE IF EXISTS `bank_card_exg`;
+CREATE TABLE `bank_card_exg` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `card_no` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `before_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `before_type_tag` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `to_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `to_type_tag` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `is_out` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT '0',
+  `is_auto` varchar(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT '0',
+  `date` timestamp NULL DEFAULT CURRENT_TIMESTAMP COMMENT '添加日期',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=9828 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for bank_card_exg_log
+-- ----------------------------
+DROP TABLE IF EXISTS `bank_card_exg_log`;
+CREATE TABLE `bank_card_exg_log` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `card_no` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `source_card_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `target_card_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `change_user` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `change_uid` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `date` timestamp NULL DEFAULT CURRENT_TIMESTAMP COMMENT '添加日期',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for bank_card_loc_info
+-- ----------------------------
+DROP TABLE IF EXISTS `bank_card_loc_info`;
+CREATE TABLE `bank_card_loc_info` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `card_no` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `ip_loc` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `mac_loc` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `unq_all` (`card_no`,`ip_loc`,`mac_loc`) USING BTREE,
+  KEY `idx_card_no` (`card_no`) USING BTREE,
+  KEY `idx_ip_loc` (`ip_loc`) USING BTREE,
+  KEY `idx_mac_loc` (`mac_loc`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=3443950 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for bank_card_loc_info_copy1
+-- ----------------------------
+DROP TABLE IF EXISTS `bank_card_loc_info_copy1`;
+CREATE TABLE `bank_card_loc_info_copy1` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `card_no` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `ip_loc` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `mac_loc` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `unq_all` (`card_no`,`ip_loc`,`mac_loc`) USING BTREE,
+  KEY `idx_card_no` (`card_no`) USING BTREE,
+  KEY `idx_ip_loc` (`ip_loc`) USING BTREE,
+  KEY `idx_mac_loc` (`mac_loc`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=6076734 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for bank_coercive_action_info
+-- ----------------------------
+DROP TABLE IF EXISTS `bank_coercive_action_info`;
+CREATE TABLE `bank_coercive_action_info` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键，自增',
+  `case_no` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '案件编号',
+  `source` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '来源',
+  `bankName` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '银行名称',
+  `account` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '账号',
+  `TypeOfFreezingAction` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '冻结措施类型',
+  `freezeAmount` double DEFAULT NULL COMMENT '冻结金额',
+  `freezeTheAuthorities` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '冻结执行机关',
+  `freezeStartDate` date DEFAULT NULL COMMENT '冻结开始日期',
+  `freezeDeadline` date DEFAULT NULL COMMENT '冻结截止日期',
+  `serialNum` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '序列号',
+  `remark` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci COMMENT '备注',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `idx_bank_coercive_action` (`bankName`,`account`,`TypeOfFreezingAction`,`freezeAmount`,`freezeTheAuthorities`,`freezeStartDate`,`freezeDeadline`,`serialNum`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=134019 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for bank_coercive_action_info_tmp
+-- ----------------------------
+DROP TABLE IF EXISTS `bank_coercive_action_info_tmp`;
+CREATE TABLE `bank_coercive_action_info_tmp` (
+  `id` int DEFAULT '0' COMMENT 'ID',
+  `case_no` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '案件编号',
+  `source` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '来源',
+  `bankName` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '银行名称',
+  `account` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '账号',
+  `TypeOfFreezingAction` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '冻结措施类型',
+  `freezeAmount` double DEFAULT NULL COMMENT '冻结金额',
+  `freezeTheAuthorities` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '冻结执行机关',
+  `freezeStartDate` date DEFAULT NULL COMMENT '冻结开始日期',
+  `freezeDeadline` date DEFAULT NULL COMMENT '冻结截止日期',
+  `serialNum` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '序列号',
+  `remark` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci COMMENT '备注'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for bank_people_info
+-- ----------------------------
+DROP TABLE IF EXISTS `bank_people_info`;
+CREATE TABLE `bank_people_info` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键，自增',
+  `case_no` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '案件编号',
+  `source` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '来源',
+  `realName` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '真实姓名',
+  `idType` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '证件类型',
+  `idNum` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '证件号码',
+  `nowLoc` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '当前地址',
+  `workLocation` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '工作地点',
+  `contactNum` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '联系电话',
+  `concatPhone` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '联系人电话',
+  `workPhone` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '工作电话',
+  `HomePhone` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '家庭电话',
+  `workUnit` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '工作单位',
+  `mailAddress` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '邮件地址',
+  `agentName` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '代理人姓名',
+  `agentIdType` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '代理人证件类型',
+  `agentId` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '代理人证件号码',
+  `nationalTaxpaymentNum` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '国家税务登记号',
+  `localTaxPaymentNum` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '地方税务登记号',
+  `legalRepresentative` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '法定代表人',
+  `legalRepresentativeIdtype` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '法定代表人证件类型',
+  `legalRepresentativeIdNum` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '法定代表人证件号码',
+  `birth` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '出生日期',
+  `Registeredaddress` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '注册地址',
+  `CustomersBusinessLicenseNumber` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '客户营业执照号码',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `idx_bank_people` (`realName`,`idType`,`idNum`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=90713 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for bank_people_info_tmp
+-- ----------------------------
+DROP TABLE IF EXISTS `bank_people_info_tmp`;
+CREATE TABLE `bank_people_info_tmp` (
+  `id` int DEFAULT '0' COMMENT 'ID',
+  `case_no` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '案件编号',
+  `source` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '来源',
+  `realName` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '真实姓名',
+  `idType` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '证件类型',
+  `idNum` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '证件号码',
+  `nowLoc` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '当前地址',
+  `workLocation` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '工作地点',
+  `contactNum` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '联系电话',
+  `concatPhone` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '联系人电话',
+  `workPhone` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '工作电话',
+  `HomePhone` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '家庭电话',
+  `workUnit` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '工作单位',
+  `mailAddress` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '邮件地址',
+  `agentName` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '代理人姓名',
+  `agentIdType` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '代理人证件类型',
+  `agentId` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '代理人证件号码',
+  `nationalTaxpaymentNum` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '国家税务登记号',
+  `localTaxPaymentNum` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '地方税务登记号',
+  `legalRepresentative` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '法定代表人',
+  `legalRepresentativeIdtype` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '法定代表人证件类型',
+  `legalRepresentativeIdNum` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '法定代表人证件号码',
+  `birth` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '出生日期',
+  `Registeredaddress` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '注册地址',
+  `CustomersBusinessLicenseNumber` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '客户营业执照号码'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for bank_statements
+-- ----------------------------
+DROP TABLE IF EXISTS `bank_statements`;
+CREATE TABLE `bank_statements` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `case_no` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '案件编号',
+  `card_no` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '卡号',
+  `card_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '卡名',
+  `dict_trade_tag` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '字典交易标签',
+  `rival_card_no` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '对方卡号',
+  `rival_card_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '对方卡名',
+  `merchant_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '商户名称',
+  `trade_money` double DEFAULT NULL COMMENT '交易金额',
+  `trade_count` int DEFAULT NULL COMMENT '交易次数',
+  `min_trade_date` datetime DEFAULT NULL COMMENT '最小交易日期',
+  `max_trade_date` datetime DEFAULT NULL COMMENT '最大交易日期',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `idx_card_no_bank_statements` (`card_no`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=55180471 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for bank_statements_turn
+-- ----------------------------
+DROP TABLE IF EXISTS `bank_statements_turn`;
+CREATE TABLE `bank_statements_turn` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `case_no` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '案件编号',
+  `card_no` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '卡号',
+  `card_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '卡名',
+  `dict_trade_tag` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '字典交易标签',
+  `rival_card_no` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '对方卡号',
+  `rival_card_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '对方卡名',
+  `merchant_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '商户名称',
+  `trade_money` double DEFAULT NULL COMMENT '交易金额',
+  `trade_count` int DEFAULT NULL COMMENT '交易次数',
+  `min_trade_date` datetime DEFAULT NULL COMMENT '最小交易日期',
+  `max_trade_date` datetime DEFAULT NULL COMMENT '最大交易日期',
+  `situation` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '情况',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `idx_card_no_bank_statements` (`card_no`) USING BTREE,
+  KEY `idx_rival_card_no` (`rival_card_no`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=56427933 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for bank_sub_account_info
+-- ----------------------------
+DROP TABLE IF EXISTS `bank_sub_account_info`;
+CREATE TABLE `bank_sub_account_info` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键，自增',
+  `case_no` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '案件编号',
+  `source` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '数据来源',
+  `bank_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '银行名称',
+  `openAnAccount` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '开户名',
+  `subAccountAccounts` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '子账户账号',
+  `balance` double DEFAULT NULL COMMENT '余额',
+  `availableBalance` double DEFAULT NULL COMMENT '可用余额',
+  `subAccountType` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '子账户类型',
+  `subAccountSerialNum` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '子账户序列号',
+  `currency` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '货币类型',
+  `banknoteLogo` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '钞票标志',
+  `accountStatus` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '账户状态',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `idx_bank_sub_account` (`openAnAccount`,`subAccountAccounts`) USING BTREE,
+  KEY `idx_open_an_account` (`openAnAccount`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=66879 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for bank_sub_account_info_tmp
+-- ----------------------------
+DROP TABLE IF EXISTS `bank_sub_account_info_tmp`;
+CREATE TABLE `bank_sub_account_info_tmp` (
+  `id` int DEFAULT '0' COMMENT 'ID',
+  `case_no` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '案件编号',
+  `source` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '数据来源',
+  `bank_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '银行名称',
+  `openAnAccount` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '开户名',
+  `subAccountAccounts` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '子账户账号',
+  `balance` double DEFAULT NULL COMMENT '余额',
+  `availableBalance` double DEFAULT NULL COMMENT '可用余额',
+  `subAccountType` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '子账户类型',
+  `subAccountSerialNum` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '子账户序列号',
+  `currency` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '货币类型',
+  `banknoteLogo` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '钞票标志',
+  `accountStatus` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '账户状态',
+  KEY `idx_open_an_account_tmp` (`openAnAccount`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for card_to_sys_logs
+-- ----------------------------
+DROP TABLE IF EXISTS `card_to_sys_logs`;
+CREATE TABLE `card_to_sys_logs` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `card_no` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `add_date` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `index_card_no` (`card_no`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=101767 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for case_card
+-- ----------------------------
+DROP TABLE IF EXISTS `case_card`;
+CREATE TABLE `case_card` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键，自增',
+  `case_no` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT '3003xpj' COMMENT '案件编号',
+  `source` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '来源信息',
+  `user_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '来源信息',
+  `card_no` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '卡号',
+  `bank_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '银行名称',
+  `card_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '卡类型',
+  `add_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP COMMENT '添加日期',
+  `batch` int DEFAULT NULL COMMENT '第几批次',
+  `is_in_bg` int DEFAULT NULL COMMENT '是否在后台',
+  `is_main` int DEFAULT NULL COMMENT '是否为主卡',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `UQE_case_card_card_no` (`card_no`) USING BTREE,
+  KEY `IDX_case_card_bank_name` (`bank_name`) USING BTREE,
+  KEY `IDX_case_card_card_type` (`card_type`) USING BTREE,
+  KEY `IDX_case_card_case_no` (`case_no`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=4442021 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for case_card_cant_add
+-- ----------------------------
+DROP TABLE IF EXISTS `case_card_cant_add`;
+CREATE TABLE `case_card_cant_add` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `card_no` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `add_date` datetime DEFAULT CURRENT_TIMESTAMP,
+  `from_bank` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  PRIMARY KEY (`id`,`card_no`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=308 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for case_card_dz
+-- ----------------------------
+DROP TABLE IF EXISTS `case_card_dz`;
+CREATE TABLE `case_card_dz` (
+  `id` bigint NOT NULL COMMENT '主键，自增',
+  `case_no` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT '3003xpj' COMMENT '案件编号',
+  `source` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '来源信息',
+  `user_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '来源信息',
+  `card_no` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '卡号',
+  `bank_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '银行名称',
+  `card_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '卡类型',
+  `add_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP COMMENT '添加日期',
+  `batch` int DEFAULT NULL COMMENT '第几批次',
+  `is_in_bg` int DEFAULT NULL COMMENT '是否在后台',
+  `is_main` int DEFAULT NULL COMMENT '是否为主卡',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `UQE_case_card_card_no` (`card_no`) USING BTREE,
+  KEY `IDX_case_card_bank_name` (`bank_name`) USING BTREE,
+  KEY `IDX_case_card_card_type` (`card_type`) USING BTREE,
+  KEY `IDX_case_card_case_no` (`case_no`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for case_card_tmp
+-- ----------------------------
+DROP TABLE IF EXISTS `case_card_tmp`;
+CREATE TABLE `case_card_tmp` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键，自增',
+  `card_no` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '银行卡',
+  `card_type` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '银行卡类型',
+  `createTime` datetime DEFAULT NULL COMMENT '创建时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `UQE_case_card_tmp_card_no` (`card_no`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=128724 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for export_routes_table
+-- ----------------------------
+DROP TABLE IF EXISTS `export_routes_table`;
+CREATE TABLE `export_routes_table` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `机器码` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `出口路由地址` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `路由厂商` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `最后记录时间` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=830 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for fengren
+-- ----------------------------
+DROP TABLE IF EXISTS `fengren`;
+CREATE TABLE `fengren` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `机器码` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `特征` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `虚拟身份` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `出口路由` int DEFAULT NULL,
+  `身份` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `通联` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `备注` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `搜索` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `is_important` tinyint DEFAULT '0',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=173 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for fr-域名设备访问情况
+-- ----------------------------
+DROP TABLE IF EXISTS `fr-域名设备访问情况`;
+CREATE TABLE `fr-域名设备访问情况` (
+  `终端码` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `终端标签` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `是否包含虚拟身份证` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `访问次数` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `第一次访问时间` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `最近一次访问时间` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for freeze_back
+-- ----------------------------
+DROP TABLE IF EXISTS `freeze_back`;
+CREATE TABLE `freeze_back` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `account` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `card_no` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `bank_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `result` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `fail_reason` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `apply_freeze_limit` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `execute_frozen_amount` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `prior_freezing_authority` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `prior_frozen_amount` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `prior_freeze_expiry_date` datetime DEFAULT NULL,
+  `balance` double DEFAULT NULL,
+  `available_account_balance` double DEFAULT NULL,
+  `execution_start_time` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `freeze_end_time` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for freeze_card
+-- ----------------------------
+DROP TABLE IF EXISTS `freeze_card`;
+CREATE TABLE `freeze_card` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `card_no` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `freeze_batch` int DEFAULT NULL,
+  `add_date` date DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=3703 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for gz_info
+-- ----------------------------
+DROP TABLE IF EXISTS `gz_info`;
+CREATE TABLE `gz_info` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键，自增',
+  `card_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '卡名',
+  `phone` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '电话',
+  `loc` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '位置',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for gz_tz_info
+-- ----------------------------
+DROP TABLE IF EXISTS `gz_tz_info`;
+CREATE TABLE `gz_tz_info` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键，自增',
+  `card_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '卡名',
+  `id_no` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '身份证号',
+  `loc` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '位置',
+  `phone` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '电话',
+  `bank_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '银行名称',
+  `card_no` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '卡号',
+  `sa_num` int DEFAULT NULL COMMENT 'SA 数量',
+  `sa_amount` double DEFAULT NULL COMMENT 'SA 金额',
+  `min_sa_time` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '最小 SA 时间',
+  `max_sa_time` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '最大 SA 时间',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for id_exg_zh
+-- ----------------------------
+DROP TABLE IF EXISTS `id_exg_zh`;
+CREATE TABLE `id_exg_zh` (
+  `微信id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `微信号` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for involved_bankcard_details
+-- ----------------------------
+DROP TABLE IF EXISTS `involved_bankcard_details`;
+CREATE TABLE `involved_bankcard_details` (
+  `uid` int NOT NULL AUTO_INCREMENT,
+  `id` int DEFAULT '0' COMMENT 'ID',
+  `card_type` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT '' COMMENT '卡类型',
+  `dict_trade_tag` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT '' COMMENT '字典交易标签',
+  `dict_card_type` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT '' COMMENT '对方卡类型',
+  `type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT '' COMMENT '类型',
+  PRIMARY KEY (`uid`) USING BTREE,
+  UNIQUE KEY `idx_involved_bankcard` (`id`,`card_type`,`dict_trade_tag`,`dict_card_type`,`type`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=12386627 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for processed_bank_people_info
+-- ----------------------------
+DROP TABLE IF EXISTS `processed_bank_people_info`;
+CREATE TABLE `processed_bank_people_info` (
+  `id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `case_no` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `source` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `realName` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `idType` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `身份证` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `户籍地` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `nowLoc` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `workLocation` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `contactNum` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `concatPhone` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `workPhone` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `HomePhone` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `workUnit` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `mailAddress` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `agentName` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `agentIdType` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `agentId` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `nationalTaxpaymentNum` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `localTaxPaymentNum` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `legalRepresentative` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `legalRepresentativeIdtype` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `legalRepresentativeIdNum` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `birth` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `Registeredaddress` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `CustomersBusinessLicenseNumber` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for tg-外号
+-- ----------------------------
+DROP TABLE IF EXISTS `tg-外号`;
+CREATE TABLE `tg-外号` (
+  `xpj内部员工id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `外号` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `来源` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `员工收u地址` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `职位` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `时间点` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `性别` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `地址` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `备注` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for tg_messages
+-- ----------------------------
+DROP TABLE IF EXISTS `tg_messages`;
+CREATE TABLE `tg_messages` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `tg_msg_id` int DEFAULT NULL COMMENT 'Telegram原始消息ID',
+  `sender_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '发送者昵称',
+  `date_sent` datetime DEFAULT NULL COMMENT '发送时间',
+  `content_text` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci COMMENT '文本内容',
+  `reply_to_id` int DEFAULT NULL COMMENT '回复的消息ID',
+  `media_path` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '媒体文件路径',
+  `source_file` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '来源HTML文件',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `ix_tg_messages_tg_msg_id` (`tg_msg_id`) USING BTREE,
+  FULLTEXT KEY `ix_content` (`content_text`)
+) ENGINE=InnoDB AUTO_INCREMENT=98038 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for ym-卡码关联情况
+-- ----------------------------
+DROP TABLE IF EXISTS `ym-卡码关联情况`;
+CREATE TABLE `ym-卡码关联情况` (
+  `PN` bigint DEFAULT NULL,
+  ` IMSI` bigint DEFAULT NULL,
+  `首次同时汇报时间` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `末次同时汇报时间` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `同时汇报次数` bigint DEFAULT NULL,
+  `查询ID` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `关联设备` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `开始时间` datetime DEFAULT NULL,
+  `结束时间` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for ym-历史连接wi-fi
+-- ----------------------------
+DROP TABLE IF EXISTS `ym-历史连接wi-fi`;
+CREATE TABLE `ym-历史连接wi-fi` (
+  `序号` bigint DEFAULT NULL,
+  `关联网关/Wi-Fi` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `类型` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `风险标签` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `位置` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `连接次数` bigint DEFAULT NULL,
+  `最新连接时间` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `查询ID` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `关联设备` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `开始时间` datetime DEFAULT NULL,
+  `结束时间` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for ym-常连wi-fi
+-- ----------------------------
+DROP TABLE IF EXISTS `ym-常连wi-fi`;
+CREATE TABLE `ym-常连wi-fi` (
+  `连接特征` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `Wi-Fi/网关名称` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `Wi-Fi/网关MAC` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `分类` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `位置` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `经纬度` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `连接天数` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `风险标签` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `查询ID` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `关联设备` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `开始时间` datetime DEFAULT NULL,
+  `结束时间` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for ym-本机历史汇报情况
+-- ----------------------------
+DROP TABLE IF EXISTS `ym-本机历史汇报情况`;
+CREATE TABLE `ym-本机历史汇报情况` (
+  `PN/IMSI` bigint DEFAULT NULL,
+  `运营商` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `开始时间` datetime DEFAULT NULL,
+  `结束时间` datetime DEFAULT NULL,
+  `查询ID` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `关联设备` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for ym-查询路径
+-- ----------------------------
+DROP TABLE IF EXISTS `ym-查询路径`;
+CREATE TABLE `ym-查询路径` (
+  `初始wifimac` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `初始wifi名称` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `附近wifimac` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `附近wifi名称` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for ym-行为习惯
+-- ----------------------------
+DROP TABLE IF EXISTS `ym-行为习惯`;
+CREATE TABLE `ym-行为习惯` (
+  `应用名称` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `应用包名` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `是否敏感APP` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `敏感标签` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `敏感类型` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `是否小众APP` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `应用分类` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `安装类型` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `卸载次数` bigint DEFAULT NULL,
+  `最早安装时间` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `最后活跃时间` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `最新安装时间` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `最后卸载时间` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `当前安装状态` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `查询ID` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `关联设备` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `开始时间` datetime DEFAULT NULL,
+  `结束时间` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for ym-设备信息
+-- ----------------------------
+DROP TABLE IF EXISTS `ym-设备信息`;
+CREATE TABLE `ym-设备信息` (
+  `手机语言` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `IMEI` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `MAC` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `OAID` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `IDFA` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `PN` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `IMSI` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `ICCID` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `安卓ID` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `卓信ID` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `CAID` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `查询ID` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `关联设备` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `开始时间` datetime DEFAULT NULL,
+  `结束时间` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for ym-设备画像
+-- ----------------------------
+DROP TABLE IF EXISTS `ym-设备画像`;
+CREATE TABLE `ym-设备画像` (
+  `查询ID` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `关联设备` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `性别` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `年龄` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `居住地` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `工作地` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `最新出现位置` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `最新出现时间` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `最新关联Wi-Fi` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `Wi-Fi MAC` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `关联时间` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `Wi-Fi位置` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `风险标签` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `设备特征标签` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `开始时间` datetime DEFAULT NULL,
+  `结束时间` datetime DEFAULT NULL,
+  `最新关联网关 MAC` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `网关位置` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for ym-路由设备
+-- ----------------------------
+DROP TABLE IF EXISTS `ym-路由设备`;
+CREATE TABLE `ym-路由设备` (
+  `序号` bigint DEFAULT NULL,
+  `MAC` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `IMEI` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `PN` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `IMSI` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `IDFA` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `OAID` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `设备机型` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `性别` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `年龄` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `连接次数` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `连接天数` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `扫描次数` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `扫描天数` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `特征标签` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `最新位置` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `最新IP` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `家庭地` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `工作地` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `连接时间` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `设备名称` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `设备MAC` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `记录开始日期` datetime DEFAULT NULL,
+  `记录结束日期` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for zh-汇总查询
+-- ----------------------------
+DROP TABLE IF EXISTS `zh-汇总查询`;
+CREATE TABLE `zh-汇总查询` (
+  `来源` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `账号类型` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `账号` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `账号信息` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `姓名` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `身份证号` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `户籍地址` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `物流、快递地址` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `手机号码` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `云镜位置` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `职业` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `出入境记录` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `虚拟身份` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `组织身份（备注、群聊分析）` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `好友、群聊dc关系人` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `备注` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for 云搜综合分析
+-- ----------------------------
+DROP TABLE IF EXISTS `云搜综合分析`;
+CREATE TABLE `云搜综合分析` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `姓名` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `性别` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `民族` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `身份证号码` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `背景` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `综合评分` int DEFAULT NULL,
+  `同住址` int DEFAULT NULL,
+  `同户号` int DEFAULT NULL,
+  `婚姻` int DEFAULT NULL,
+  `邻居` int DEFAULT NULL,
+  `同机构` int DEFAULT NULL,
+  `铁路同乘车` int DEFAULT NULL,
+  `同乘机` int DEFAULT NULL,
+  `同出入境` int DEFAULT NULL,
+  `同车违章` int DEFAULT NULL,
+  `同案人员` int DEFAULT NULL,
+  `同住宿` int DEFAULT NULL,
+  `在逃同案人员` int DEFAULT NULL,
+  `在逃同撤销` int DEFAULT NULL,
+  `同订票` int DEFAULT NULL,
+  `同值机` int DEFAULT NULL,
+  `来源姓名` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `来源身份证` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `idx_sfz_source` (`身份证号码`,`来源身份证`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=209208 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for 人员微信号
+-- ----------------------------
+DROP TABLE IF EXISTS `人员微信号`;
+CREATE TABLE `人员微信号` (
+  `姓名` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci DEFAULT NULL,
+  `身份证号` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci DEFAULT NULL,
+  `虚拟身份` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for 人员总体归纳
+-- ----------------------------
+DROP TABLE IF EXISTS `人员总体归纳`;
+CREATE TABLE `人员总体归纳` (
+  `来源类型` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `来源` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `账号类型` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `账号` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `手机号码` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `账号信息` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `姓名` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `身份证号` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `户籍地址` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `物流、快递地址` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `云镜位置` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `组织身份（备注、群聊分析）` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `备注` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for 人员电子档案
+-- ----------------------------
+DROP TABLE IF EXISTS `人员电子档案`;
+CREATE TABLE `人员电子档案` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `姓名` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `性别` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `身份证号码` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `民族` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `出生日期` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `婚姻状况` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `生肖` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `星座` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `别名绰号` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `曾用名` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `身高` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `血型` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `最高学历` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `政治面貌` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `职业` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `从业单位` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `兵役状况` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `体貌特征描述` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `出生地区划` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `籍贯` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `户籍地区划` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `户籍地址` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `其它地址` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `电话号码` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `行为标签` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=64 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for 档案_全国机动车
+-- ----------------------------
+DROP TABLE IF EXISTS `档案_全国机动车`;
+CREATE TABLE `档案_全国机动车` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `号牌种类` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `号牌号码` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `中文品牌` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `车辆识别代号` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `车辆类型` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `车身颜色` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `发证机关` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `初次登记日期` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `机动车状态` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `机动车所有人` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `证件类别` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `证件号码` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `住所地址` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `暂住证编号` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `暂住地址` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `是否抵押/质押` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `机动车档案编号` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `机动车发动机号` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `机动车发动机型号` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `机动车能源种类` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `机动车发动机排量` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `机动车发动机功率` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `机动车总质量` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `机动车核定载质量` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `机动车核定载客人数` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `机动车准牵引总质量` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `出厂日期` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `机动车驾驶证号` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `更新时间` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for 档案_全国驾驶人
+-- ----------------------------
+DROP TABLE IF EXISTS `档案_全国驾驶人`;
+CREATE TABLE `档案_全国驾驶人` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `姓名` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `证件号码` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `性别` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `出生日期` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `发证机关` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `初次领证日期` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `准驾车型` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `证件种类` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `国籍/地区` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `登记住所详址` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `联系住所详址` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `暂住证编号` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `原准驾车型` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `有效期止` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `有效期起` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `驾驶证期限` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `驾驶证状态` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `驾驶证超分日期` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `累积记分` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `更新时间` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=43 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for 档案_全部轨迹
+-- ----------------------------
+DROP TABLE IF EXISTS `档案_全部轨迹`;
+CREATE TABLE `档案_全部轨迹` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `标题` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `姓名` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `内容` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=11474 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for 档案_出入境记录
+-- ----------------------------
+DROP TABLE IF EXISTS `档案_出入境记录`;
+CREATE TABLE `档案_出入境记录` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `姓名` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `国籍/地区` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `性别` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `身份证号` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `证件类别` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `证件号码` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `出生日期` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `出入日期时间` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `出入日期` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `出入时间` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `出入口岸` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `签证种类` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `签证号码` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `前往/归来国家/地区` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `出入境类别` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `交通方式` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `交通工具` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `旅游团号` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `入库时间` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `更新时间` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `操作类型` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `操作时间` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `户籍地_省` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `户籍地_市` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `户籍地_县` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `籍贯_省` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `籍贯_市` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `籍贯_县` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=314 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for 档案_出入境证件
+-- ----------------------------
+DROP TABLE IF EXISTS `档案_出入境证件`;
+CREATE TABLE `档案_出入境证件` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `姓名` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `身份证号` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `证件种类` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `证件号码` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `签发日期` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `截止日期` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `前往地国家/地区` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `签发机关` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `性别` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `民族` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `出生日期` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `出生地国家/地区` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `户口所在地` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `所属派出所` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `出境事由` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `入库时间` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `更新时间` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=104 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for 档案_在逃人员撤销
+-- ----------------------------
+DROP TABLE IF EXISTS `档案_在逃人员撤销`;
+CREATE TABLE `档案_在逃人员撤销` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `姓名` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `证件号码` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `在逃人员类型` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `立案日期` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `抓获日期` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `抓获地点区划` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `在逃人员编号` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `曾用名` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `别名绰号` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `出生日期` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `性别` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `民族` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `证件种类` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `职业类别` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `国籍/地区` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `籍贯` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `户籍地区划` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `户籍地` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `现住址区划` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `现住址` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `死亡时间` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `口音` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `体貌特征描述` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `体表标记描述` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `十指指纹编号` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `在逃人员人员DNA编号` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `年龄上限` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `年龄下限` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `身高上限` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `身高下限` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `逃跑时间` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `境内外去向` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `人员出境确认依据` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `最近出境日期` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `逃跑方向简要情况` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `人员状态` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `备注` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `案件编号` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `案件类别` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `立案单位分类` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `立案单位` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `简要案情` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `通缉令编号` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `通缉级别` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `是否部督捕` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `部督捕级别` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `抓逃奖金` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `案事件死亡人数` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `损失价值人民币元` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `挽回价值万元` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `边控开始时间` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `边控结束时间` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `红色通报号码` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `红色通报到期日期` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `犯罪嫌疑人到案状态` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `抓逃奖金兑现简要情况` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `是否抓获犯罪嫌疑人` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `抓获地点补充区划` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `抓获地点` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `抓获单位分类` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `抓获单位分类补充描述` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `抓获单位` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `境外抓捕协助单位` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `抓获方式` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `登记审批是否通过` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `登记审批简要情况` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `登记审批单位` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `登记审批姓名` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `登记人公民身份号码` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `登记人联系电话` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `登记审批时间` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `撤销单位` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `撤销人姓名` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `撤销时间` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `撤销审批是否通过` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `撤销审批简要情况` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `撤销审批单位` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `撤销审批人姓名` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `撤销审批人公民身份号码` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `撤销审批人联系电话` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `撤销审批时间` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `是否撤销通缉` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `撤销一人多网标识` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `登记单位` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `登记人员姓名` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `登记人员公民身份号码` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `登记人员联系电话` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `登记时间` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `操作单位` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `操作人员姓名` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `操作人员公民身份号码` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `信息来源` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `申请修改填表编号` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `申请修改业务` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `业务状态` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `主办单位分类` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `主办单位` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `主办单位联系电话` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `主办人姓名` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `主办人公民身份号码` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `主办人联系电话` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `协办人姓名` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `协办人公民身份号码` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `协办人联系电话` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `协作单位分类` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `协助单位` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `在逃人员审批人姓名` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `在逃人员处理时间` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `撤销审批人` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `撤销处理时间` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `审批未通过原因` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `删除事由描述` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for 档案_失信被执行人员
+-- ----------------------------
+DROP TABLE IF EXISTS `档案_失信被执行人员`;
+CREATE TABLE `档案_失信被执行人员` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `失信被执行人` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `公民身份号码` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `案号` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `发布时间` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `执行法院` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `地域名称` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `多证件列表` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `性别` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `年龄` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `身份证号码／组织机构代码` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `组织机构代码` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `企业法人姓名` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `标识自然人或企业法人` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `执行依据文号` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `法律生效文书确定的义务` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `作出执行依据单位` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `被执行人的履行情况` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `失信被执行人具体情形` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `立案时间` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `已履行部分` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `未履行部分` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `信息操作类型` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for 档案_婚姻信息
+-- ----------------------------
+DROP TABLE IF EXISTS `档案_婚姻信息`;
+CREATE TABLE `档案_婚姻信息` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `男方姓名` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `男方公民身份号码` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `女方姓名` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `女方公民身份号码` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `登记类型` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `登记日期` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `登记单位` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `男方国籍/地区` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `男方民族` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `女方国籍/地区` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `女方民族` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for 档案_旅客住宿信息
+-- ----------------------------
+DROP TABLE IF EXISTS `档案_旅客住宿信息`;
+CREATE TABLE `档案_旅客住宿信息` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `姓名` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `身份证号` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `证件号码` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `入住时间` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `离店时间` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `旅店名称` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `房间号码` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `旅店区划` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `旅店地址` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `证件类型` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `国籍/地区` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `性别` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `民族` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `出生日期` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `户籍地区划` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `户籍地详址` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `旅店代码` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `旅店负责人` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `旅店房间数` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `旅店床位数` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `所属派出所名称` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `机构数据位置` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `省级名称` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `入库时间` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `更新时间` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `信息删除标识` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `户籍地_省` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `户籍地_市` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `户籍地_县` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `籍贯_省` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `籍贯_市` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `籍贯_县` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=3272 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for 档案_最高学历学位
+-- ----------------------------
+DROP TABLE IF EXISTS `档案_最高学历学位`;
+CREATE TABLE `档案_最高学历学位` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `姓名` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `身份证号码` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `最高学历` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `最高学位` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `性别` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `民族` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `出生日期` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for 档案_机动车违章
+-- ----------------------------
+DROP TABLE IF EXISTS `档案_机动车违章`;
+CREATE TABLE `档案_机动车违章` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `当事人` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `驾驶证号` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `号牌号码` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `违法时间` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `违法地址` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `违法行为` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `处理时间` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `处理机关` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `号牌种类` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `更新时间` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=657 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for 档案_机构法人信息
+-- ----------------------------
+DROP TABLE IF EXISTS `档案_机构法人信息`;
+CREATE TABLE `档案_机构法人信息` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `姓名` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `证件号码` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `机构名称` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `机构类型` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `办证日期` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `行政区划` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `经营范围` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `机构代码` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `注册日期` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `新经济行业` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `常用证件` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `作废日期` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `邮政编码` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `机构地址` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `经济类型` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `年检期限` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `年检日期` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `变更日期` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for 档案_民航离港记录
+-- ----------------------------
+DROP TABLE IF EXISTS `档案_民航离港记录`;
+CREATE TABLE `档案_民航离港记录` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `旅客中文姓名` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `身份证号` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `证件号码` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `航班日期` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `起飞港站` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `到达航站` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `航空公司` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `航班号` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `旅客名` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `旅客中间名` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `旅客姓` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `性别` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `出生日期` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `证件类型` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `旅客姓名` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `出生地` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `航班后缀` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `旅客座位` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `离港时间` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `进港时间` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `离港国家/地区` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `进港国家/地区` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `旅客出入境标识` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `旅客国家/地区` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `发证国家/地区` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `发证日期` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `过期日期` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `值机时间` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `值机办公室` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `执行旅客操作的终端号` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `执行值机的代理号` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `ICS中记录信息` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `共同订票标识字段` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `信息删除标识` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `更新时间` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `户籍地_省` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `户籍地_市` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `户籍地_县` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `籍贯_省` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `籍贯_市` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `籍贯_县` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=975 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for 档案_民航订票记录
+-- ----------------------------
+DROP TABLE IF EXISTS `档案_民航订票记录`;
+CREATE TABLE `档案_民航订票记录` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `旅客中文名` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `身份证号` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `证件号码` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `出发日期时间` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `出发日期` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `出发时间` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `起飞机场` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `到达机场` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `旅客英文姓` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `旅客英文名` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `证件类型` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `到达日期` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `到达时间` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `承运航空公司` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `航班号` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `航班号后缀` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `VIP标识` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `代理人编号` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `团体标识` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `订座GDS` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `共同订票标识` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `索引Key值` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `客票状态` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `操作类型` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `操作时间` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `删除判断标识` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `更新时间` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `户籍地_省` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `户籍地_市` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `户籍地_县` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `籍贯_省` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `籍贯_市` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `籍贯_县` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=1783 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for 档案_监所管理违法犯罪人员
+-- ----------------------------
+DROP TABLE IF EXISTS `档案_监所管理违法犯罪人员`;
+CREATE TABLE `档案_监所管理违法犯罪人员` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `姓名` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `身份证号` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `出所原因` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `抓获/入所日期` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `入所原因` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `出所日期` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `办案单位` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `别名/绰号` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `性别` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `民族` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `出生日期` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `文化程度` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `户口所在地区划` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `户口所在地` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `现居住地区划` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `现居住地` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `身高` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `足长` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `体表标记` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `专长` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `个人身份` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `案件类别` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `简要案情` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `警情处理结果` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `法律文书号` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `刑期` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `出所去向` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `得分` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `备注` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `省份编码` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for 档案_铁路售票信息
+-- ----------------------------
+DROP TABLE IF EXISTS `档案_铁路售票信息`;
+CREATE TABLE `档案_铁路售票信息` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `姓名` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `身份证号` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `证件号码` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `车号` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `发车日期` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `发站` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `到站` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `车厢号` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `座位号` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `票号` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `车票状态` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `证件类型` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `更新时间` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `信息删除标识` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `户籍地_省` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `户籍地_市` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `户籍地_县` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `籍贯_省` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `籍贯_市` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `籍贯_县` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=5878 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for 档案_银行核查信息
+-- ----------------------------
+DROP TABLE IF EXISTS `档案_银行核查信息`;
+CREATE TABLE `档案_银行核查信息` (
+  `姓名` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `身份证号` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `核查时间` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `银行名称` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `银行地址` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `核查结果` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `核查耗时` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `认证码` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `银行代码` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `银行性质` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `银行类型` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `银行所在省` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `银行所在市` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `银行所在区县` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `银行邮编` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `银行邮箱` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `业务类型` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `核查总数` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `核查人` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `入库时间` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `id` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `户籍地_省` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `户籍地_市` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `户籍地_县` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `籍贯_省` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `籍贯_市` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `籍贯_县` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for 管理_出入境信息
+-- ----------------------------
+DROP TABLE IF EXISTS `管理_出入境信息`;
+CREATE TABLE `管理_出入境信息` (
+  `姓名` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `身份证号码` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `出入标识` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `国籍地区` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `性别` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `出生日期` date DEFAULT NULL,
+  `证件类别` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `证件号码` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `出入时间` datetime DEFAULT NULL,
+  `出入口岸` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `交通工具` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `前往地/出发地` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+
+SET FOREIGN_KEY_CHECKS = 1;
