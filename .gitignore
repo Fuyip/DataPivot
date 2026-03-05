@@ -111,3 +111,11 @@ celerybeat.pid
 *.pid
 *.seed
 *.pid.lock
+
+# 归档文档
+docs/archive/
+
+# SQL 脚本（保留结构，忽略具体案件 SQL）
+sql/*
+!sql/schema/
+!sql/.gitkeep
