@@ -6,9 +6,10 @@ from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-# 将项目根目录添加到 Python 路径
+# 将项目根目录和tools目录添加到 Python 路径
 root_dir = Path(__file__).parent.parent
 sys.path.insert(0, str(root_dir))
+sys.path.insert(0, str(root_dir / "tools"))
 
 from backend.core.config import config
 from backend.api.v1 import auth, users, cases, case_permissions, permissions, bank_statements, case_cards, import_rules
