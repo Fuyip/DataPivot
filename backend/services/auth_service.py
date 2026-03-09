@@ -104,3 +104,45 @@ def get_current_active_user(current_user: User = Depends(get_current_user)) -> U
             detail="用户已被禁用"
         )
     return current_user
+
+
+def require_admin(current_user: User = Depends(get_current_active_user)) -> User:
+    """
+    要求管理员或超级管理员权限
+
+    Args:
+        current_user: 当前用户
+
+    Returns:
+        User: 当前用户
+
+    Raises:
+        HTTPException: 权限不足时抛出 403 异常
+    """
+    if current_user.role not in ["admin", "super_admin"]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="权限不足，需要管理员权限"
+        )
+    return current_user
+
+
+def require_super_admin(current_user: User = Depends(get_current_active_user)) -> User:
+    """
+    要求超级管理员权限
+
+    Args:
+        current_user: 当前用户
+
+    Returns:
+        User: 当前用户
+
+    Raises:
+        HTTPException: 权限不足时抛出 403 异常
+    """
+    if current_user.role != "super_admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="权限不足，需要超级管理员权限"
+        )
+    return current_user

@@ -17,11 +17,11 @@ echo ""
 
 # 检查 FastAPI
 echo "2. FastAPI 状态:"
-if curl -s http://localhost:8000/docs > /dev/null 2>&1; then
-    echo "   ✓ FastAPI 正在运行 (http://localhost:8000)"
-else
-    echo "   ✗ FastAPI 未运行"
-fi
+./scripts/backend_service.sh status || true
+echo ""
+
+echo "2.1 前端状态:"
+./scripts/frontend_service.sh status || true
 echo ""
 
 # 检查 Celery

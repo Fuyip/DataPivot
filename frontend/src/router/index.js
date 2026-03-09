@@ -76,6 +76,16 @@ const routes = [
           icon: 'Setting',
           requiresAdmin: true
         }
+      },
+      {
+        path: 'system/bank-info',
+        name: 'BankInfoManagement',
+        component: () => import('@/views/System/BankInfoManagement/index.vue'),
+        meta: {
+          title: '银行信息管理',
+          icon: 'DataLine',
+          requiresAdmin: true
+        }
       }
     ]
   }

@@ -48,6 +48,10 @@
           <el-icon><Setting /></el-icon>
           <span>导入规则管理</span>
         </el-menu-item>
+        <el-menu-item index="/system/bank-info">
+          <el-icon><DataLine /></el-icon>
+          <span>银行信息管理</span>
+        </el-menu-item>
       </el-sub-menu>
     </el-menu>
   </div>

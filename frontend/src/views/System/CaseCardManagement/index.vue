@@ -61,7 +61,7 @@
             批量删除
           </el-button>
           <el-button @click="handleRematch">重新匹配银行</el-button>
-          <el-button @click="showImportTasks = true">导入任务</el-button>
+          <el-button @click="handleShowImportTasks">导入任务</el-button>
         </div>
       </div>
 
@@ -184,8 +184,16 @@
         <el-table-column prop="success_count" label="成功" width="80" />
         <el-table-column prop="error_count" label="失败" width="80" />
         <el-table-column prop="created_at" label="导入时间" width="180" />
-        <el-table-column label="操作" width="100">
+        <el-table-column label="操作" width="180">
           <template #default="{ row }">
+            <el-button
+              link
+              type="warning"
+              :disabled="!row.error_details || row.error_details.length === 0"
+              @click="showTaskErrors(row)"
+            >
+              查看错误
+            </el-button>
             <el-button link type="danger" @click="handleDeleteTask(row.id)">删除</el-button>
           </template>
         </el-table-column>
@@ -480,6 +488,9 @@ const handleImportSubmit = async () => {
     const data = await caseCardApi.importCaseCards(selectedCaseId.value, importFile.value)
     ElMessage.success(`导入完成: 成功 ${data.success_count} 条, 失败 ${data.error_count} 条`)
     importDialogVisible.value = false
+    if (showImportTasks.value) {
+      loadImportTasks()
+    }
     loadTableData()
   } catch (error) {
     ElMessage.error(error.response?.data?.detail || '导入失败')
@@ -559,6 +570,56 @@ const loadImportTasks = async () => {
   } finally {
     tasksLoading.value = false
   }
+}
+
+const downloadErrorReport = (errors) => {
+  import('xlsx').then(XLSX => {
+    const wsData = [['行号', '卡号', '错误原因']]
+
+    errors.forEach(err => {
+      wsData.push([err.row, err.card_no, err.error])
+    })
+
+    const ws = XLSX.utils.aoa_to_sheet(wsData)
+    const wb = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(wb, ws, '导入错误报告')
+    XLSX.writeFile(wb, `导入错误报告_${Date.now()}.xlsx`)
+    ElMessage.success('错误报告已下载')
+  }).catch(() => {
+    ElMessage.error('下载错误报告失败')
+  })
+}
+
+const handleShowImportTasks = () => {
+  showImportTasks.value = true
+  loadImportTasks()
+}
+
+const showTaskErrors = (task) => {
+  if (!task.error_details || task.error_details.length === 0) {
+    ElMessage.info('该任务没有错误记录')
+    return
+  }
+
+  const errorHtml = task.error_details.map(err =>
+    `<div style="margin: 5px 0;">第${err.row}行 - 卡号: ${err.card_no} - ${err.error}</div>`
+  ).join('')
+
+  ElMessageBox.confirm(
+    `<div style="max-height: 400px; overflow-y: auto;">${errorHtml}</div>`,
+    `任务 #${task.id} 错误详情`,
+    {
+      dangerouslyUseHTMLString: true,
+      confirmButtonText: '下载错误报告',
+      cancelButtonText: '关闭',
+      distinguishCancelAndClose: true,
+      type: 'warning'
+    }
+  ).then(() => {
+    downloadErrorReport(task.error_details)
+  }).catch(() => {
+    // 用户点击关闭或取消
+  })
 }
 
 // 删除导入任务

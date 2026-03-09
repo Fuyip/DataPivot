@@ -117,5 +117,7 @@ docs/archive/
 
 # SQL 脚本（保留结构，忽略具体案件 SQL）
 sql/*
+!sql/migrations/
+!sql/migrations/**
 !sql/schema/
 !sql/.gitkeep

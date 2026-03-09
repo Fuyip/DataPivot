@@ -13,6 +13,10 @@ pkill -f "celery.*worker" 2>/dev/null || echo "Celery Worker 未运行"
 
 # 停止 FastAPI (查找并终止进程)
 echo "停止 FastAPI..."
-pkill -f "uvicorn.*backend.main:app" 2>/dev/null || echo "FastAPI 未运行"
+./scripts/backend_service.sh stop || true
+
+# 停止前端
+echo "停止前端..."
+./scripts/frontend_service.sh stop || true
 
 echo "✓ 所有服务已停止"

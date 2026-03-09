@@ -12,7 +12,7 @@ sys.path.insert(0, str(root_dir))
 sys.path.insert(0, str(root_dir / "tools"))
 
 from backend.core.config import config
-from backend.api.v1 import auth, users, cases, case_permissions, permissions, bank_statements, case_cards, import_rules, bank_cards
+from backend.api.v1 import auth, users, cases, case_permissions, permissions, bank_statements, case_cards, import_rules, bank_cards, bank_info
 
 # 创建 FastAPI 应用实例
 app = FastAPI(
@@ -69,6 +69,7 @@ app.include_router(bank_statements.router, prefix="/api/v1")
 app.include_router(case_cards.router, prefix="/api/v1/cases", tags=["案件银行卡"])
 app.include_router(import_rules.router, prefix="/api/v1/import-rules")
 app.include_router(bank_cards.router, prefix="/api/v1", tags=["银行卡归属查询"])
+app.include_router(bank_info.router, prefix="/api/v1/bank-info", tags=["银行信息管理"])
 
 
 if __name__ == "__main__":
