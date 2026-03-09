@@ -21,6 +21,11 @@
         <span>银行流水上传</span>
       </el-menu-item>
 
+      <el-menu-item index="/bank-card-match">
+        <el-icon><CreditCard /></el-icon>
+        <span>银行卡归属查询</span>
+      </el-menu-item>
+
       <el-sub-menu index="system" v-if="isAdmin">
         <template #title>
           <el-icon><Setting /></el-icon>

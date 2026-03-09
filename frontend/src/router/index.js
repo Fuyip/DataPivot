@@ -58,6 +58,15 @@ const routes = [
           icon: 'Setting',
           requiresAdmin: true
         }
+      },
+      {
+        path: 'bank-card-match',
+        name: 'BankCardMatch',
+        component: () => import('@/views/System/BankCardMatch/index.vue'),
+        meta: {
+          title: '银行卡归属查询',
+          icon: 'CreditCard'
+        }
       }
     ]
   }
