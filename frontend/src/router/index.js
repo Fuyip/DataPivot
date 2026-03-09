@@ -21,6 +21,33 @@ const routes = [
         meta: { title: '仪表盘', icon: 'DataLine' }
       },
       {
+        path: 'bank-statements',
+        name: 'BankStatement',
+        component: () => import('@/views/System/BankStatement/index.vue'),
+        meta: {
+          title: '银行流水上传',
+          icon: 'Upload'
+        }
+      },
+      {
+        path: 'bank-card-match',
+        name: 'BankCardMatch',
+        component: () => import('@/views/System/BankCardMatch/index.vue'),
+        meta: {
+          title: '银行卡归属查询',
+          icon: 'CreditCard'
+        }
+      },
+      {
+        path: 'case-cards',
+        name: 'CaseCardManagement',
+        component: () => import('@/views/System/CaseCardManagement/index.vue'),
+        meta: {
+          title: '案件银行卡管理',
+          icon: 'Postcard'
+        }
+      },
+      {
         path: 'system/users',
         name: 'UserManagement',
         component: () => import('@/views/System/UserManagement/index.vue'),
@@ -41,15 +68,6 @@ const routes = [
         }
       },
       {
-        path: 'system/bank-statements',
-        name: 'BankStatement',
-        component: () => import('@/views/System/BankStatement/index.vue'),
-        meta: {
-          title: '银行流水上传',
-          icon: 'Upload'
-        }
-      },
-      {
         path: 'system/import-rules',
         name: 'ImportRuleManagement',
         component: () => import('@/views/System/ImportRuleManagement/index.vue'),
@@ -57,15 +75,6 @@ const routes = [
           title: '导入规则管理',
           icon: 'Setting',
           requiresAdmin: true
-        }
-      },
-      {
-        path: 'bank-card-match',
-        name: 'BankCardMatch',
-        component: () => import('@/views/System/BankCardMatch/index.vue'),
-        meta: {
-          title: '银行卡归属查询',
-          icon: 'CreditCard'
         }
       }
     ]

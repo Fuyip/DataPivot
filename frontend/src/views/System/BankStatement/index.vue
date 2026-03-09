@@ -36,29 +36,6 @@
 
     <!-- 主内容区域 -->
     <div v-else class="content-area">
-      <!-- 案件银行卡管理卡片 -->
-      <el-card class="section-card">
-        <template #header>
-          <div class="card-header">
-            <span class="card-title">
-              <el-icon><CreditCard /></el-icon>
-              案件银行卡管理
-            </span>
-            <el-button
-              size="small"
-              @click="showCaseCardManager = !showCaseCardManager"
-            >
-              {{ showCaseCardManager ? '收起' : '展开' }}
-            </el-button>
-          </div>
-        </template>
-        <el-collapse-transition>
-          <div v-show="showCaseCardManager">
-            <CaseCardManager :case-id="selectedCaseId" />
-          </div>
-        </el-collapse-transition>
-      </el-card>
-
       <!-- 银行流水上传卡片 -->
       <el-card class="section-card">
         <template #header>
@@ -363,7 +340,6 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import {
   Upload,
   UploadFilled,
-  CreditCard,
   Refresh,
   Document,
   Folder,
@@ -374,7 +350,6 @@ import { caseApi } from '@/api/case'
 import { bankStatementApi } from '@/api/bankStatement'
 import { importRuleApi } from '@/api/importRule'
 import { useAuthStore } from '@/stores/auth'
-import CaseCardManager from '@/components/CaseCard/CaseCardManager.vue'
 
 const authStore = useAuthStore()
 const currentUser = computed(() => authStore.user)
@@ -390,7 +365,6 @@ const uploadDialogVisible = ref(false)
 const detailDialogVisible = ref(false)
 const currentTask = ref(null)
 const uploadRef = ref(null)
-const showCaseCardManager = ref(true)
 const templateList = ref([])
 
 let pollingTimer = null

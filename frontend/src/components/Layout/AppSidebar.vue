@@ -16,7 +16,7 @@
         <span>仪表盘</span>
       </el-menu-item>
 
-      <el-menu-item index="/system/bank-statements">
+      <el-menu-item index="/bank-statements">
         <el-icon><Upload /></el-icon>
         <span>银行流水上传</span>
       </el-menu-item>
@@ -24,6 +24,11 @@
       <el-menu-item index="/bank-card-match">
         <el-icon><CreditCard /></el-icon>
         <span>银行卡归属查询</span>
+      </el-menu-item>
+
+      <el-menu-item index="/case-cards">
+        <el-icon><Postcard /></el-icon>
+        <span>案件银行卡管理</span>
       </el-menu-item>
 
       <el-sub-menu index="system" v-if="isAdmin">
