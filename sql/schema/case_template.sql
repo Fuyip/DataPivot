@@ -25,7 +25,7 @@ SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- ----------------------------
--- 案件数据库表结构 (共 76 个)
+-- 案件数据库表结构 (共 77 个)
 -- ----------------------------
 
 DROP TABLE IF EXISTS `29-qq好友`;
@@ -1727,5 +1727,31 @@ CREATE TABLE `管理_出入境信息` (
   `出入口岸` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `交通工具` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `前往地/出发地` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
+
+-- 案件库不包含 users 表，因此这里保留审批字段但不建立外键。
+DROP TABLE IF EXISTS `bank_info_change_requests`;
+CREATE TABLE `bank_info_change_requests` (
+  `id` int NOT NULL AUTO_INCREMENT COMMENT '变更申请ID',
+  `table_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '表类型: bank_bin/sy_bank',
+  `change_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '变更类型: create/update/delete',
+  `old_data` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci COMMENT '原始数据（JSON）',
+  `new_data` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '新数据（JSON）',
+  `reason` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '变更原因',
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'pending' COMMENT '状态: pending/approved/rejected/executed',
+  `created_by` int NOT NULL COMMENT '申请人ID',
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '申请时间',
+  `reviewed_by` int DEFAULT NULL COMMENT '审批人ID',
+  `reviewed_at` datetime DEFAULT NULL COMMENT '审批时间',
+  `review_comment` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '审批意见',
+  `executed_at` datetime DEFAULT NULL COMMENT '执行时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `idx_status` (`status`) USING BTREE,
+  KEY `idx_table_type` (`table_type`) USING BTREE,
+  KEY `idx_created_by` (`created_by`) USING BTREE,
+  KEY `idx_reviewed_by` (`reviewed_by`) USING BTREE,
+  KEY `idx_created_at` (`created_at`) USING BTREE,
+  KEY `idx_status_created_at` (`status`,`created_at`) USING BTREE,
+  KEY `idx_table_change_type` (`table_type`,`change_type`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
 SET FOREIGN_KEY_CHECKS = 1;

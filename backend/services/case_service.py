@@ -211,7 +211,8 @@ def verify_case_database_tables(database_name: str) -> dict:
         'bank_all_statements_with_info',
         'bank_account_info',
         'bank_people_info',
-        'case_card'
+        'case_card',
+        'bank_info_change_requests'
     ]
 
     encoded_password = quote_plus(config.MYSQL_PASSWORD)
