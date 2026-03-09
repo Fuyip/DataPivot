@@ -2,7 +2,7 @@ from typing import Optional
 from sqlalchemy import text, create_engine
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import sessionmaker, Session
-from database import get_db
+from database import get_db, get_system_db
 from backend.schemas.case_card import CaseCardCreate, CaseCardUpdate
 from backend.services.case_service import get_case_database_url
 import pandas as pd
@@ -55,14 +55,35 @@ class CaseCardService:
             params['limit'] = page_size
             params['offset'] = offset
 
-            query_sql = f"""
-                SELECT id, case_no, source, user_id, card_no, bank_name, card_type,
-                       add_date, batch, is_in_bg, is_main
-                FROM case_card
-                WHERE {where_sql}
-                ORDER BY add_date DESC
-                LIMIT :limit OFFSET :offset
+            # 检查表是否有 import_task_id 字段
+            check_column_sql = """
+                SELECT COUNT(*)
+                FROM information_schema.COLUMNS
+                WHERE TABLE_SCHEMA = DATABASE()
+                AND TABLE_NAME = 'case_card'
+                AND COLUMN_NAME = 'import_task_id'
             """
+            has_import_task_id = db.execute(text(check_column_sql)).scalar() > 0
+
+            # 根据字段是否存在构建查询
+            if has_import_task_id:
+                query_sql = f"""
+                    SELECT id, case_no, source, user_id, card_no, bank_name, card_type,
+                           add_date, batch, is_in_bg, is_main, import_task_id
+                    FROM case_card
+                    WHERE {where_sql}
+                    ORDER BY add_date DESC
+                    LIMIT :limit OFFSET :offset
+                """
+            else:
+                query_sql = f"""
+                    SELECT id, case_no, source, user_id, card_no, bank_name, card_type,
+                           add_date, batch, is_in_bg, is_main
+                    FROM case_card
+                    WHERE {where_sql}
+                    ORDER BY add_date DESC
+                    LIMIT :limit OFFSET :offset
+                """
 
             result = db.execute(text(query_sql), params)
             items = [dict(row._mapping) for row in result]
@@ -82,12 +103,31 @@ class CaseCardService:
         db = CaseCardService._get_case_db(database_name)
 
         try:
-            query_sql = """
-                SELECT id, case_no, source, user_id, card_no, bank_name, card_type,
-                       add_date, batch, is_in_bg, is_main
-                FROM case_card
-                WHERE id = :card_id
+            # 检查表是否有 import_task_id 字段
+            check_column_sql = """
+                SELECT COUNT(*)
+                FROM information_schema.COLUMNS
+                WHERE TABLE_SCHEMA = DATABASE()
+                AND TABLE_NAME = 'case_card'
+                AND COLUMN_NAME = 'import_task_id'
             """
+            has_import_task_id = db.execute(text(check_column_sql)).scalar() > 0
+
+            # 根据字段是否存在构建查询
+            if has_import_task_id:
+                query_sql = """
+                    SELECT id, case_no, source, user_id, card_no, bank_name, card_type,
+                           add_date, batch, is_in_bg, is_main, import_task_id
+                    FROM case_card
+                    WHERE id = :card_id
+                """
+            else:
+                query_sql = """
+                    SELECT id, case_no, source, user_id, card_no, bank_name, card_type,
+                           add_date, batch, is_in_bg, is_main
+                    FROM case_card
+                    WHERE id = :card_id
+                """
 
             result = db.execute(text(query_sql), {"card_id": card_id}).fetchone()
             return dict(result._mapping) if result else None
@@ -234,13 +274,16 @@ class CaseCardService:
             db.close()
 
     @staticmethod
-    def import_from_template(database_name: str, case_code: str, file_content: bytes) -> dict:
+    def import_from_template(database_name: str, case_code: str, file_content: bytes, case_id: int, user_id: int) -> dict:
         """从模板导入案件银行卡"""
+        import json
+
         db = CaseCardService._get_case_db(database_name)
+        system_db = next(get_system_db())
 
         try:
-            # 读取Excel文件
-            df = pd.read_excel(BytesIO(file_content))
+            # 读取Excel文件，指定卡号列为字符串类型，防止科学计数法
+            df = pd.read_excel(BytesIO(file_content), dtype={'卡号': str})
 
             # 验证必需列
             required_columns = ['卡号']
@@ -248,80 +291,400 @@ class CaseCardService:
                 if col not in df.columns:
                     raise ValueError(f"缺少必需列: {col}")
 
+            # 获取卡类型字典，建立value到label的映射
+            card_types = CaseCardService.get_card_types()
+            value_to_label_map = {ct['value']: ct['label'] for ct in card_types}
+            label_to_label_map = {ct['label']: ct['label'] for ct in card_types}
+
+            # 创建导入任务记录
+            from backend.models.import_task import ImportTask
+            import_task = ImportTask(
+                case_id=case_id,
+                task_type='case_card',
+                file_name='imported_file.xlsx',
+                total_count=len(df),
+                created_by=user_id
+            )
+            system_db.add(import_task)
+            system_db.commit()
+            system_db.refresh(import_task)
+
+            task_id = import_task.id
+
             success_count = 0
             error_count = 0
             errors = []
 
             for index, row in df.iterrows():
                 try:
+                    # 检查卡号是否为空
+                    if pd.isna(row['卡号']) or str(row['卡号']).strip() == '':
+                        error_count += 1
+                        errors.append({
+                            "row": index + 2,
+                            "card_no": "空",
+                            "error": "卡号不能为空"
+                        })
+                        continue
+
+                    card_no = str(row['卡号']).strip()
+
+                    # 检查卡号是否已存在
+                    check_sql = "SELECT id FROM case_card WHERE card_no = :card_no"
+                    existing = db.execute(text(check_sql), {"card_no": card_no}).fetchone()
+                    if existing:
+                        error_count += 1
+                        errors.append({
+                            "row": index + 2,
+                            "card_no": card_no,
+                            "error": "卡号已存在"
+                        })
+                        continue
+
+                    # 自动匹配银行名称（不拒绝导入，记录为NULL）
+                    match_result = CaseCardService.match_bank_name(card_no)
+                    if match_result['matched']:
+                        bank_name = match_result['bank_name']
+                    else:
+                        bank_name = None  # 未匹配的银行名称设为NULL
+
+                    # 处理卡类型：将value转换为label，或保持label不变
+                    card_type_input = str(row.get('卡类型', '')).strip() if pd.notna(row.get('卡类型')) else None
+                    card_type_label = None
+                    if card_type_input:
+                        # 先检查是否是label（如"入款卡"）
+                        if card_type_input in label_to_label_map:
+                            card_type_label = card_type_input
+                        # 再检查是否是value（如"c15q"），需要转换为label
+                        elif card_type_input in value_to_label_map:
+                            card_type_label = value_to_label_map[card_type_input]
+                        else:
+                            # 既不是label也不是value，拒绝导入
+                            error_count += 1
+                            errors.append({
+                                "row": index + 2,
+                                "card_no": card_no,
+                                "error": f"无效的卡类型: {card_type_input}"
+                            })
+                            continue
+                    else:
+                        # 卡类型为空，拒绝导入
+                        error_count += 1
+                        errors.append({
+                            "row": index + 2,
+                            "card_no": card_no,
+                            "error": "卡类型不能为空"
+                        })
+                        continue
+
                     # 准备数据
                     card_data = {
                         "case_no": case_code,
-                        "card_no": str(row['卡号']).strip(),
-                        "bank_name": str(row.get('银行名称', '')).strip() if pd.notna(row.get('银行名称')) else None,
-                        "card_type": str(row.get('卡类型', '')).strip() if pd.notna(row.get('卡类型')) else None,
-                        "source": str(row.get('来源', '')).strip() if pd.notna(row.get('来源')) else None,
+                        "card_no": card_no,
+                        "bank_name": bank_name,
+                        "card_type": card_type_label,
+                        "source": str(row.get('卡主姓名', '')).strip() if pd.notna(row.get('卡主姓名')) else None,
                         "user_id": str(row.get('用户ID', '')).strip() if pd.notna(row.get('用户ID')) else None,
-                        "batch": int(row.get('批次', 0)) if pd.notna(row.get('批次')) else None,
-                        "is_in_bg": int(row.get('是否在后台', 0)) if pd.notna(row.get('是否在后台')) else None,
-                        "is_main": int(row.get('是否主卡', 0)) if pd.notna(row.get('是否主卡')) else None
+                        "batch": int(row.get('批次', 0)) if pd.notna(row.get('批次')) else 0,
+                        "is_in_bg": 0,
+                        "is_main": 0
                     }
 
-                    # 插入数据
-                    insert_sql = """
-                        INSERT INTO case_card (case_no, source, user_id, card_no, bank_name,
-                                              card_type, batch, is_in_bg, is_main)
-                        VALUES (:case_no, :source, :user_id, :card_no, :bank_name,
-                                :card_type, :batch, :is_in_bg, :is_main)
+                    # 检查表是否有 import_task_id 字段
+                    check_column_sql = """
+                        SELECT COUNT(*)
+                        FROM information_schema.COLUMNS
+                        WHERE TABLE_SCHEMA = DATABASE()
+                        AND TABLE_NAME = 'case_card'
+                        AND COLUMN_NAME = 'import_task_id'
                     """
+                    has_import_task_id = db.execute(text(check_column_sql)).scalar() > 0
+
+                    # 插入数据
+                    if has_import_task_id:
+                        card_data["import_task_id"] = task_id
+                        insert_sql = """
+                            INSERT INTO case_card (case_no, source, user_id, card_no, bank_name,
+                                                  card_type, batch, is_in_bg, is_main, import_task_id)
+                            VALUES (:case_no, :source, :user_id, :card_no, :bank_name,
+                                    :card_type, :batch, :is_in_bg, :is_main, :import_task_id)
+                        """
+                    else:
+                        insert_sql = """
+                            INSERT INTO case_card (case_no, source, user_id, card_no, bank_name,
+                                                  card_type, batch, is_in_bg, is_main)
+                            VALUES (:case_no, :source, :user_id, :card_no, :bank_name,
+                                    :card_type, :batch, :is_in_bg, :is_main)
+                        """
 
                     db.execute(text(insert_sql), card_data)
                     success_count += 1
 
                 except IntegrityError:
                     error_count += 1
-                    errors.append(f"第{index + 2}行: 卡号 {row['卡号']} 已存在")
-                    db.rollback()
+                    errors.append({
+                        "row": index + 2,
+                        "card_no": card_no if 'card_no' in locals() else "未知",
+                        "error": "卡号已存在"
+                    })
                 except Exception as e:
                     error_count += 1
-                    errors.append(f"第{index + 2}行: {str(e)}")
-                    db.rollback()
+                    # 安全获取卡号，避免 nan 值
+                    safe_card_no = "未知"
+                    if 'card_no' in locals():
+                        safe_card_no = card_no
+                    elif pd.notna(row.get('卡号')):
+                        safe_card_no = str(row.get('卡号'))
+
+                    errors.append({
+                        "row": index + 2,
+                        "card_no": safe_card_no,
+                        "error": str(e)
+                    })
+
+            db.commit()
+
+            # 更新导入任务统计
+            import_task.success_count = success_count
+            import_task.error_count = error_count
+            import_task.error_details = json.dumps(errors[:50], ensure_ascii=False)
+            system_db.commit()
+
+            return {
+                "task_id": task_id,
+                "success_count": success_count,
+                "error_count": error_count,
+                "errors": errors[:50]  # 返回前50个错误
+            }
+
+        except Exception as e:
+            db.rollback()
+            system_db.rollback()
+            raise ValueError(f"导入失败: {str(e)}")
+        finally:
+            db.close()
+            system_db.close()
+
+    @staticmethod
+    def match_bank_name(card_no: str) -> dict:
+        """
+        根据卡号自动匹配银行名称
+
+        Args:
+            card_no: 银行卡号
+
+        Returns:
+            {"bank_name": "中国工商银行", "matched": True} 或
+            {"bank_name": None, "matched": False}
+        """
+        db = next(get_system_db())
+        try:
+            sql = text("""
+                SELECT t3.to_bank
+                FROM bank_bin t1
+                LEFT JOIN sy_bank t3
+                    ON t3.from_bank = t1.bank_name AND t3.sys = 'jz'
+                WHERE t1.bin = LEFT(:card_no, t1.bin_len)
+                    AND t1.card_len = LENGTH(:card_no)
+                LIMIT 1
+            """)
+
+            result = db.execute(sql, {"card_no": card_no}).fetchone()
+
+            if result and result[0]:
+                return {"bank_name": result[0], "matched": True}
+            else:
+                return {"bank_name": None, "matched": False}
+        finally:
+            db.close()
+
+    @staticmethod
+    def get_card_types() -> list:
+        """
+        获取卡类型字典
+
+        Returns:
+            [{"value": "c30", "label": "疑似员工卡"}, ...]
+        """
+        db = next(get_system_db())
+        try:
+            sql = text("""
+                SELECT d_value, d_label
+                FROM sys_dict
+                WHERE d_type = 'card_type'
+                ORDER BY d_value
+            """)
+
+            result = db.execute(sql)
+            return [{"value": row[0], "label": row[1]} for row in result]
+        finally:
+            db.close()
+
+    @staticmethod
+    def batch_delete_case_cards(database_name: str, card_ids: list) -> dict:
+        """
+        批量删除案件银行卡
+
+        Args:
+            database_name: 案件数据库名称
+            card_ids: 要删除的卡片ID列表
+
+        Returns:
+            {"success_count": 3, "failed_count": 0}
+        """
+        db = CaseCardService._get_case_db(database_name)
+
+        try:
+            success_count = 0
+            failed_count = 0
+
+            for card_id in card_ids:
+                try:
+                    delete_sql = "DELETE FROM case_card WHERE id = :card_id"
+                    result = db.execute(text(delete_sql), {"card_id": card_id})
+                    if result.rowcount > 0:
+                        success_count += 1
+                    else:
+                        failed_count += 1
+                except Exception:
+                    failed_count += 1
 
             db.commit()
 
             return {
                 "success_count": success_count,
-                "error_count": error_count,
-                "errors": errors[:10]  # 只返回前10个错误
+                "failed_count": failed_count
             }
-
         except Exception as e:
             db.rollback()
-            raise ValueError(f"导入失败: {str(e)}")
+            raise ValueError(f"批量删除失败: {str(e)}")
+        finally:
+            db.close()
+
+    @staticmethod
+    def rematch_unmatched_banks(database_name: str) -> dict:
+        """
+        重新匹配未匹配的银行名称
+
+        Returns:
+            {"matched_count": 5, "unmatched_count": 2}
+        """
+        db = CaseCardService._get_case_db(database_name)
+
+        try:
+            # 查询所有未匹配银行名称的卡（bank_name为NULL）
+            query_sql = "SELECT id, card_no FROM case_card WHERE bank_name IS NULL"
+            result = db.execute(text(query_sql))
+            unmatched_cards = [dict(row._mapping) for row in result]
+
+            matched_count = 0
+            unmatched_count = 0
+
+            for card in unmatched_cards:
+                # 尝试匹配银行名称
+                match_result = CaseCardService.match_bank_name(card['card_no'])
+
+                if match_result['matched']:
+                    # 更新银行名称
+                    update_sql = "UPDATE case_card SET bank_name = :bank_name WHERE id = :card_id"
+                    db.execute(text(update_sql), {
+                        "bank_name": match_result['bank_name'],
+                        "card_id": card['id']
+                    })
+                    matched_count += 1
+                else:
+                    unmatched_count += 1
+
+            db.commit()
+
+            return {
+                "matched_count": matched_count,
+                "unmatched_count": unmatched_count
+            }
+        except Exception as e:
+            db.rollback()
+            raise ValueError(f"重新匹配失败: {str(e)}")
         finally:
             db.close()
 
     @staticmethod
     def get_template() -> BytesIO:
         """获取导入模板"""
-        # 创建模板DataFrame
-        template_data = {
-            '卡号': ['6222021234567890123', '6228481234567890123'],
-            '银行名称': ['工商银行', '农业银行'],
-            '卡类型': ['借记卡', '借记卡'],
-            '来源': ['线索', '调证'],
-            '用户ID': ['', ''],
-            '批次': [1, 1],
-            '是否在后台': [0, 0],
-            '是否主卡': [1, 0]
-        }
+        from openpyxl import Workbook
+        from openpyxl.worksheet.datavalidation import DataValidation
 
-        df = pd.DataFrame(template_data)
+        # 获取卡类型字典
+        card_types = CaseCardService.get_card_types()
+        card_type_labels = [ct['label'] for ct in card_types]
 
-        # 导出到Excel
+        # 创建工作簿
+        wb = Workbook()
+        ws = wb.active
+        ws.title = '案件银行卡模板'
+
+        # 设置表头
+        headers = ['卡号', '卡类型', '卡主姓名', '用户ID', '批次']
+        ws.append(headers)
+
+        # 添加示例数据
+        ws.append(['6222021234567890123', '公司入款卡', '张三', 'user001', 1])
+        ws.append(['6228481234567890123', '四方(跑分)入款卡', '李四', 'user002', 1])
+
+        # 为卡类型列添加数据验证（下拉选项）
+        if card_type_labels:
+            dv = DataValidation(
+                type="list",
+                formula1=f'"{",".join(card_type_labels)}"',
+                allow_blank=True
+            )
+            dv.error = '请从下拉列表中选择卡类型'
+            dv.errorTitle = '无效的卡类型'
+            ws.add_data_validation(dv)
+            # 应用到B列（卡类型列）的所有行
+            dv.add(f'B2:B1000')
+
+        # 调整列宽
+        ws.column_dimensions['A'].width = 25
+        ws.column_dimensions['B'].width = 20
+        ws.column_dimensions['C'].width = 15
+        ws.column_dimensions['D'].width = 15
+        ws.column_dimensions['E'].width = 10
+
+        # 保存到BytesIO
         output = BytesIO()
-        with pd.ExcelWriter(output, engine='openpyxl') as writer:
-            df.to_excel(writer, index=False, sheet_name='案件银行卡模板')
+        wb.save(output)
+        output.seek(0)
+        return output
 
+    @staticmethod
+    def export_import_errors(errors: list) -> BytesIO:
+        """导出导入错误报告为Excel"""
+        from openpyxl import Workbook
+
+        # 创建工作簿
+        wb = Workbook()
+        ws = wb.active
+        ws.title = '导入错误报告'
+
+        # 设置表头
+        headers = ['行号', '卡号', '错误原因']
+        ws.append(headers)
+
+        # 添加错误数据
+        for error in errors:
+            ws.append([
+                error.get('row', ''),
+                error.get('card_no', ''),
+                error.get('error', '')
+            ])
+
+        # 调整列宽
+        ws.column_dimensions['A'].width = 10
+        ws.column_dimensions['B'].width = 25
+        ws.column_dimensions['C'].width = 50
+
+        # 保存到BytesIO
+        output = BytesIO()
+        wb.save(output)
         output.seek(0)
         return output

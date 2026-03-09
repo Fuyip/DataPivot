@@ -50,5 +50,35 @@ export const caseCardApi = {
         'Content-Type': 'multipart/form-data'
       }
     })
+  },
+
+  // 根据卡号自动匹配银行名称
+  matchBankName(caseId, cardNo) {
+    return request.post(`/v1/cases/${caseId}/case-cards/match-bank`, { card_no: cardNo })
+  },
+
+  // 获取卡类型字典
+  getCardTypes(caseId) {
+    return request.get(`/v1/cases/${caseId}/case-cards/card-types`)
+  },
+
+  // 批量删除案件银行卡
+  batchDeleteCaseCards(caseId, cardIds) {
+    return request.post(`/v1/cases/${caseId}/case-cards/batch-delete`, { card_ids: cardIds })
+  },
+
+  // 获取导入任务列表
+  getImportTasks(caseId, params) {
+    return request.get(`/v1/cases/${caseId}/case-cards/import-tasks`, { params })
+  },
+
+  // 根据导入任务删除银行卡
+  deleteCardsByTask(caseId, taskId) {
+    return request.delete(`/v1/cases/${caseId}/case-cards/import-tasks/${taskId}`)
+  },
+
+  // 重新匹配未匹配的银行名称
+  rematchUnmatchedBanks(caseId) {
+    return request.post(`/v1/cases/${caseId}/case-cards/rematch-banks`)
   }
 }

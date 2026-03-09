@@ -829,11 +829,13 @@ CREATE TABLE `case_card` (
   `batch` int DEFAULT NULL COMMENT '第几批次',
   `is_in_bg` int DEFAULT NULL COMMENT '是否在后台',
   `is_main` int DEFAULT NULL COMMENT '是否为主卡',
+  `import_task_id` int DEFAULT NULL COMMENT '导入任务ID',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE KEY `UQE_case_card_card_no` (`card_no`) USING BTREE,
   KEY `IDX_case_card_bank_name` (`bank_name`) USING BTREE,
   KEY `IDX_case_card_card_type` (`card_type`) USING BTREE,
-  KEY `IDX_case_card_case_no` (`case_no`) USING BTREE
+  KEY `IDX_case_card_case_no` (`case_no`) USING BTREE,
+  KEY `IDX_case_card_import_task_id` (`import_task_id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=4442021 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
 
 -- ----------------------------

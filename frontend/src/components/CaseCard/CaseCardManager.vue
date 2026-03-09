@@ -17,6 +17,22 @@
               <el-icon><Download /></el-icon>
               导出
             </el-button>
+            <el-button @click="showImportTasks">
+              <el-icon><List /></el-icon>
+              导入任务
+            </el-button>
+            <el-button @click="handleRematchBanks">
+              <el-icon><Refresh /></el-icon>
+              一键匹配银行
+            </el-button>
+            <el-button
+              type="danger"
+              :disabled="selectedRows.length === 0"
+              @click="handleBatchDelete"
+            >
+              <el-icon><Delete /></el-icon>
+              批量删除
+            </el-button>
             <el-button type="primary" @click="handleAdd">
               <el-icon><Plus /></el-icon>
               添加银行卡
@@ -50,8 +66,12 @@
             clearable
             style="width: 150px"
           >
-            <el-option label="借记卡" value="借记卡" />
-            <el-option label="信用卡" value="信用卡" />
+            <el-option
+              v-for="type in cardTypes"
+              :key="type.value"
+              :label="type.label"
+              :value="type.value"
+            />
           </el-select>
         </el-form-item>
         <el-form-item>
@@ -67,20 +87,15 @@
         border
         stripe
         style="margin-top: 20px"
+        @selection-change="handleSelectionChange"
       >
+        <el-table-column type="selection" width="55" />
         <el-table-column prop="id" label="ID" width="80" />
         <el-table-column prop="card_no" label="卡号" width="200" show-overflow-tooltip />
         <el-table-column prop="bank_name" label="银行名称" width="150" />
         <el-table-column prop="card_type" label="卡类型" width="100" />
-        <el-table-column prop="source" label="来源" width="120" />
+        <el-table-column prop="source" label="卡主姓名" width="120" />
         <el-table-column prop="batch" label="批次" width="80" />
-        <el-table-column prop="is_main" label="是否主卡" width="100">
-          <template #default="{ row }">
-            <el-tag :type="row.is_main === 1 ? 'success' : 'info'">
-              {{ row.is_main === 1 ? '是' : '否' }}
-            </el-tag>
-          </template>
-        </el-table-column>
         <el-table-column prop="add_date" label="添加日期" width="180" />
         <el-table-column label="操作" width="180" fixed="right">
           <template #default="{ row }">
@@ -127,6 +142,7 @@
             v-model="formData.card_no"
             placeholder="请输入卡号"
             :disabled="isEdit"
+            @blur="handleCardNoBlur"
           />
         </el-form-item>
         <el-form-item label="银行名称" prop="bank_name">
@@ -134,30 +150,22 @@
         </el-form-item>
         <el-form-item label="卡类型" prop="card_type">
           <el-select v-model="formData.card_type" placeholder="请选择卡类型" style="width: 100%">
-            <el-option label="借记卡" value="借记卡" />
-            <el-option label="信用卡" value="信用卡" />
+            <el-option
+              v-for="type in cardTypes"
+              :key="type.value"
+              :label="type.label"
+              :value="type.value"
+            />
           </el-select>
         </el-form-item>
-        <el-form-item label="来源" prop="source">
-          <el-input v-model="formData.source" placeholder="请输入来源" />
+        <el-form-item label="卡主姓名" prop="source">
+          <el-input v-model="formData.source" placeholder="请输入卡主姓名" />
         </el-form-item>
         <el-form-item label="用户ID" prop="user_id">
           <el-input v-model="formData.user_id" placeholder="请输入用户ID" />
         </el-form-item>
         <el-form-item label="批次" prop="batch">
-          <el-input-number v-model="formData.batch" :min="1" style="width: 100%" />
-        </el-form-item>
-        <el-form-item label="是否主卡" prop="is_main">
-          <el-radio-group v-model="formData.is_main">
-            <el-radio :label="1">是</el-radio>
-            <el-radio :label="0">否</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="是否在后台" prop="is_in_bg">
-          <el-radio-group v-model="formData.is_in_bg">
-            <el-radio :label="1">是</el-radio>
-            <el-radio :label="0">否</el-radio>
-          </el-radio-group>
+          <el-input-number v-model="formData.batch" :min="0" style="width: 100%" />
         </el-form-item>
       </el-form>
 
@@ -208,13 +216,65 @@
         </el-button>
       </template>
     </el-dialog>
+
+    <!-- 导入任务对话框 -->
+    <el-dialog
+      v-model="taskDialogVisible"
+      title="导入任务管理"
+      width="900px"
+      :close-on-click-modal="false"
+    >
+      <el-table
+        v-loading="taskLoading"
+        :data="taskList"
+        border
+        stripe
+      >
+        <el-table-column prop="id" label="任务ID" width="80" />
+        <el-table-column prop="file_name" label="文件名" width="150" show-overflow-tooltip />
+        <el-table-column prop="total_count" label="总数" width="80" />
+        <el-table-column prop="success_count" label="成功" width="80" />
+        <el-table-column prop="error_count" label="失败" width="80" />
+        <el-table-column prop="created_at" label="导入时间" width="180" />
+        <el-table-column label="操作" width="200" fixed="right">
+          <template #default="{ row }">
+            <el-button
+              size="small"
+              type="warning"
+              :disabled="!row.error_details || row.error_details.length === 0"
+              @click="showTaskErrors(row)"
+            >
+              查看错误
+            </el-button>
+            <el-button
+              size="small"
+              type="danger"
+              @click="handleDeleteTaskCards(row)"
+            >
+              删除数据
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+
+      <el-pagination
+        v-model:current-page="taskPagination.page"
+        v-model:page-size="taskPagination.page_size"
+        :page-sizes="[10, 20, 50]"
+        :total="taskPagination.total"
+        layout="total, sizes, prev, pager, next"
+        style="margin-top: 20px; justify-content: flex-end"
+        @size-change="fetchImportTasks"
+        @current-change="fetchImportTasks"
+      />
+    </el-dialog>
   </div>
 </template>
 
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Download, Upload, Plus, UploadFilled } from '@element-plus/icons-vue'
+import { Download, Upload, Plus, UploadFilled, Delete, List, Refresh } from '@element-plus/icons-vue'
 import { caseCardApi } from '@/api/caseCard'
 
 const props = defineProps({
@@ -230,11 +290,16 @@ const importing = ref(false)
 const tableData = ref([])
 const dialogVisible = ref(false)
 const importDialogVisible = ref(false)
+const taskDialogVisible = ref(false)
+const taskLoading = ref(false)
 const isEdit = ref(false)
 const currentRow = ref(null)
 const formRef = ref(null)
 const uploadRef = ref(null)
 const importFileList = ref([])
+const selectedRows = ref([])
+const cardTypes = ref([])
+const taskList = ref([])
 
 const searchForm = reactive({
   card_no: '',
@@ -248,13 +313,19 @@ const pagination = reactive({
   total: 0
 })
 
+const taskPagination = reactive({
+  page: 1,
+  page_size: 20,
+  total: 0
+})
+
 const formData = reactive({
   card_no: '',
   bank_name: '',
   card_type: '',
   source: '',
   user_id: '',
-  batch: 1,
+  batch: 0,
   is_main: 0,
   is_in_bg: 0
 })
@@ -284,6 +355,38 @@ async function fetchData() {
     ElMessage.error('获取数据失败')
   } finally {
     loading.value = false
+  }
+}
+
+// 加载卡类型
+async function loadCardTypes() {
+  try {
+    const data = await caseCardApi.getCardTypes(props.caseId)
+    cardTypes.value = data || []
+  } catch (error) {
+    console.error('加载卡类型失败', error)
+  }
+}
+
+// 选择变化处理
+function handleSelectionChange(selection) {
+  selectedRows.value = selection
+}
+
+// 卡号失焦时自动匹配银行
+async function handleCardNoBlur() {
+  if (!formData.card_no || formData.card_no.length < 16 || isEdit.value) {
+    return
+  }
+
+  try {
+    const data = await caseCardApi.matchBankName(props.caseId, formData.card_no)
+    if (data.matched && data.bank_name) {
+      formData.bank_name = data.bank_name
+      ElMessage.success(`已自动匹配银行：${data.bank_name}`)
+    }
+  } catch (error) {
+    console.error('银行名称匹配失败', error)
   }
 }
 
@@ -381,11 +484,42 @@ function resetForm() {
     card_type: '',
     source: '',
     user_id: '',
-    batch: 1,
+    batch: 0,
     is_main: 0,
     is_in_bg: 0
   })
   formRef.value?.clearValidate()
+}
+
+// 批量删除
+async function handleBatchDelete() {
+  if (selectedRows.value.length === 0) {
+    ElMessage.warning('请选择要删除的记录')
+    return
+  }
+
+  try {
+    await ElMessageBox.confirm(
+      `确定要删除选中的 ${selectedRows.value.length} 条记录吗？`,
+      '批量删除',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }
+    )
+
+    const cardIds = selectedRows.value.map(row => row.id)
+    await caseCardApi.batchDeleteCaseCards(props.caseId, cardIds)
+
+    ElMessage.success('批量删除成功')
+    selectedRows.value = []
+    fetchData()
+  } catch (error) {
+    if (error !== 'cancel') {
+      ElMessage.error('批量删除失败')
+    }
+  }
 }
 
 // 导出
@@ -448,7 +582,27 @@ async function handleImportSubmit() {
     )
 
     if (result.errors && result.errors.length > 0) {
-      console.warn('导入错误:', result.errors)
+      // 显示错误详情
+      const errorHtml = result.errors.map(err =>
+        `<div style="margin: 5px 0;">第${err.row}行 - 卡号: ${err.card_no} - ${err.error}</div>`
+      ).join('')
+
+      ElMessageBox.confirm(
+        `<div style="max-height: 400px; overflow-y: auto;">${errorHtml}</div>`,
+        '导入错误详情',
+        {
+          dangerouslyUseHTMLString: true,
+          confirmButtonText: '下载错误报告',
+          cancelButtonText: '关闭',
+          distinguishCancelAndClose: true,
+          type: 'warning'
+        }
+      ).then(() => {
+        // 下载错误报告
+        downloadErrorReport(result.errors)
+      }).catch(() => {
+        // 用户点击关闭或取消
+      })
     }
 
     importDialogVisible.value = false
@@ -460,8 +614,131 @@ async function handleImportSubmit() {
   }
 }
 
+// 下载错误报告
+function downloadErrorReport(errors) {
+  // 使用 xlsx 库生成 Excel
+  import('xlsx').then(XLSX => {
+    const ws_data = [['行号', '卡号', '错误原因']]
+    errors.forEach(err => {
+      ws_data.push([err.row, err.card_no, err.error])
+    })
+
+    const ws = XLSX.utils.aoa_to_sheet(ws_data)
+    const wb = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(wb, ws, '导入错误报告')
+
+    // 下载文件
+    XLSX.writeFile(wb, `导入错误报告_${Date.now()}.xlsx`)
+    ElMessage.success('错误报告已下载')
+  }).catch(() => {
+    ElMessage.error('下载错误报告失败')
+  })
+}
+
+// 显示导入任务列表
+function showImportTasks() {
+  taskDialogVisible.value = true
+  fetchImportTasks()
+}
+
+// 获取导入任务列表
+async function fetchImportTasks() {
+  taskLoading.value = true
+  try {
+    const params = {
+      page: taskPagination.page,
+      page_size: taskPagination.page_size
+    }
+    const data = await caseCardApi.getImportTasks(props.caseId, params)
+    taskList.value = data.items || []
+    taskPagination.total = data.total || 0
+  } catch (error) {
+    ElMessage.error('获取导入任务失败')
+  } finally {
+    taskLoading.value = false
+  }
+}
+
+// 显示任务错误详情
+function showTaskErrors(task) {
+  if (!task.error_details || task.error_details.length === 0) {
+    ElMessage.info('该任务没有错误记录')
+    return
+  }
+
+  const errorHtml = task.error_details.map(err =>
+    `<div style="margin: 5px 0;">第${err.row}行 - 卡号: ${err.card_no} - ${err.error}</div>`
+  ).join('')
+
+  ElMessageBox.confirm(
+    `<div style="max-height: 400px; overflow-y: auto;">${errorHtml}</div>`,
+    `任务 #${task.id} 错误详情`,
+    {
+      dangerouslyUseHTMLString: true,
+      confirmButtonText: '下载错误报告',
+      cancelButtonText: '关闭',
+      distinguishCancelAndClose: true,
+      type: 'warning'
+    }
+  ).then(() => {
+    downloadErrorReport(task.error_details)
+  }).catch(() => {
+    // 用户点击关闭或取消
+  })
+}
+
+// 删除任务相关的所有银行卡
+async function handleDeleteTaskCards(task) {
+  try {
+    await ElMessageBox.confirm(
+      `确定要删除任务 #${task.id} 导入的所有银行卡吗？这将删除 ${task.success_count} 条记录。`,
+      '删除确认',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }
+    )
+
+    await caseCardApi.deleteCardsByTask(props.caseId, task.id)
+    ElMessage.success('删除成功')
+    fetchImportTasks()
+    fetchData()
+  } catch (error) {
+    if (error !== 'cancel') {
+      ElMessage.error('删除失败')
+    }
+  }
+}
+
+// 一键重新匹配银行
+async function handleRematchBanks() {
+  try {
+    await ElMessageBox.confirm(
+      '确定要重新匹配所有未匹配的银行名称吗？',
+      '重新匹配',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'info'
+      }
+    )
+
+    const result = await caseCardApi.rematchUnmatchedBanks(props.caseId)
+    ElMessage.success(
+      `匹配完成：成功匹配 ${result.matched_count} 条，仍有 ${result.unmatched_count} 条未匹配`
+    )
+    fetchData()
+  } catch (error) {
+    if (error !== 'cancel') {
+      ElMessage.error('重新匹配失败')
+    }
+  }
+}
+
 onMounted(() => {
   fetchData()
+  loadCardTypes()
 })
 </script>
 

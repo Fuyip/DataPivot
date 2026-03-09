@@ -7,7 +7,7 @@ class CaseCardBase(BaseModel):
     """案件银行卡基础模型"""
     card_no: str = Field(..., description="卡号")
     bank_name: Optional[str] = Field(None, description="银行名称")
-    card_type: Optional[str] = Field(None, description="卡类型")
+    card_type: str = Field(..., description="卡类型")
     source: Optional[str] = Field(None, description="来源信息")
     user_id: Optional[str] = Field(None, description="用户ID")
     batch: Optional[int] = Field(None, description="批次")
