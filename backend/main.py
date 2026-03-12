@@ -23,6 +23,9 @@ app = FastAPI(
     redoc_url="/redoc"
 )
 
+# 设置最大请求体大小为 20GB
+app.state.max_body_size = 20 * 1024 * 1024 * 1024  # 20GB
+
 # 配置 CORS 中间件
 origins = config.CORS_ORIGINS.split(",") if hasattr(config, "CORS_ORIGINS") else [
     "http://localhost:5173",
@@ -78,5 +81,8 @@ if __name__ == "__main__":
         "main:app",
         host="0.0.0.0",
         port=8000,
-        reload=True
+        reload=True,
+        limit_max_requests=10000,
+        timeout_keep_alive=300,
+        limit_concurrency=1000
     )

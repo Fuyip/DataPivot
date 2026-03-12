@@ -247,7 +247,7 @@ statements = db.query(BankStatement)\
 | card_name | VARCHAR(100) | 持卡人姓名 |
 | dict_trade_tag | VARCHAR(20) | 交易标签（in/out） |
 | rival_card_no | VARCHAR(50) | 对手卡号 |
-| rival_card_name | VARCHAR(100) | 对手卡户名 |
+| rival_card_name | VARCHAR(255) | 对手卡户名 |
 | merchant_name | VARCHAR(200) | 商户名称 |
 | trade_money | DECIMAL(15,2) | 交易金额 |
 | trade_count | INT | 交易笔数 |
@@ -273,7 +273,7 @@ statements = db.query(BankStatement)\
 | trade_money | DECIMAL(15,2) | 交易金额 |
 | trade_balance | DECIMAL(15,2) | 账户余额 |
 | rival_card_no | VARCHAR(50) | 对手卡号 |
-| rival_card_name | VARCHAR(100) | 对手卡户名 |
+| rival_card_name | VARCHAR(255) | 对手卡户名 |
 | dict_trade_tag | VARCHAR(20) | 交易方向 |
 
 #### bank_all_statements_lastest（最新流水表）

@@ -91,7 +91,7 @@
             </el-statistic>
           </el-col>
           <el-col :span="6">
-            <el-statistic title="总文件数" :value="statistics.total_files">
+            <el-statistic title="总CSV数" :value="statistics.total_files">
               <template #prefix>
                 <el-icon><Folder /></el-icon>
               </template>
@@ -142,7 +142,7 @@
               />
             </template>
           </el-table-column>
-          <el-table-column prop="file_count" label="文件数" width="100" />
+          <el-table-column prop="file_count" label="CSV数" width="100" />
           <el-table-column prop="total_records" label="总记录数" width="120" />
           <el-table-column prop="created_at" label="创建时间" width="180" />
           <el-table-column label="操作" width="200" fixed="right">
@@ -198,7 +198,7 @@
         <template #default>
           <div>当前案件: <strong>{{ selectedCase?.case_name }} ({{ selectedCase?.case_code }})</strong></div>
           <div style="margin-top: 5px; font-size: 12px; color: #909399">
-            支持上传 ZIP/RAR/7Z 格式的压缩包，可同时上传多个文件
+            支持上传压缩包，或直接选择包含 CSV 的文件夹；目录结构会随上传一起保留
           </div>
         </template>
       </el-alert>
@@ -229,21 +229,41 @@
         </el-form-item>
 
         <el-form-item label="上传文件" required>
+          <div class="upload-actions">
+            <el-button @click="openFolderPicker">
+              <el-icon><Folder /></el-icon>
+              选择文件夹
+            </el-button>
+            <span class="upload-actions__hint">可与拖拽/点击上传混用</span>
+          </div>
           <el-upload
             ref="uploadRef"
             :auto-upload="false"
             :file-list="uploadForm.fileList"
             :on-change="handleFileChange"
             :on-remove="handleFileRemove"
-            accept=".zip,.rar,.7z"
+            accept=".zip,.rar,.7z,.csv,.tar,.gz,.tgz"
             multiple
             drag
           >
             <el-icon class="el-icon--upload"><upload-filled /></el-icon>
             <div class="el-upload__text">
-              拖拽文件到此处或<em>点击上传</em>
+              拖拽文件到此处或<em>点击上传文件</em>
             </div>
+            <template #tip>
+              <div class="el-upload__tip">
+                单独上传支持压缩包和 CSV，文件夹上传会自动带上相对路径
+              </div>
+            </template>
           </el-upload>
+          <input
+            ref="folderInputRef"
+            class="folder-input"
+            type="file"
+            multiple
+            webkitdirectory
+            @change="handleFolderChange"
+          />
         </el-form-item>
       </el-form>
 
@@ -281,8 +301,11 @@
         <el-descriptions-item label="当前步骤" :span="2">
           {{ currentTask.current_step || '-' }}
         </el-descriptions-item>
-        <el-descriptions-item label="已处理文件">
-          {{ currentTask.processed_files }} / {{ currentTask.total_files }}
+        <el-descriptions-item label="已处理CSV">
+          {{ currentTask.processed_files || 0 }}
+        </el-descriptions-item>
+        <el-descriptions-item label="CSV总数">
+          {{ currentTask.total_files || 0 }}
         </el-descriptions-item>
         <el-descriptions-item label="总记录数">
           {{ currentTask.total_records || 0 }}
@@ -365,6 +388,7 @@ const uploadDialogVisible = ref(false)
 const detailDialogVisible = ref(false)
 const currentTask = ref(null)
 const uploadRef = ref(null)
+const folderInputRef = ref(null)
 const templateList = ref([])
 
 let pollingTimer = null
@@ -383,6 +407,8 @@ const uploadForm = reactive({
   fileList: [],
   templateId: null
 })
+
+const supportedUploadExtensions = ['.zip', '.rar', '.7z', '.csv', '.tar', '.gz', '.tgz']
 
 // 当前选中的案件
 const selectedCase = computed(() => {
@@ -494,14 +520,69 @@ function handleTemplateChange() {
   // 可以在这里添加模板变化的处理逻辑
 }
 
+function getRelativePath(file) {
+  return file.webkitRelativePath || ''
+}
+
+function isSupportedUploadFile(file) {
+  const lowerName = file.name.toLowerCase()
+  return supportedUploadExtensions.some(extension => lowerName.endsWith(extension))
+}
+
+function normalizeUploadItem(file, fallbackUid) {
+  const relativePath = getRelativePath(file)
+
+  return {
+    name: relativePath || file.name,
+    size: file.size,
+    status: 'ready',
+    percentage: 0,
+    uid: file.uid || fallbackUid || `${file.name}-${file.size}-${file.lastModified}`,
+    raw: file,
+    relativePath
+  }
+}
+
+function mergeUploadFiles(files) {
+  const validFiles = files.filter(isSupportedUploadFile)
+  const nextFileMap = new Map()
+
+  ;[...uploadForm.fileList, ...validFiles.map(file => normalizeUploadItem(file))].forEach(item => {
+    const key = item.relativePath || `${item.name}-${item.size}-${item.raw?.lastModified || item.uid}`
+    nextFileMap.set(key, item)
+  })
+
+  uploadForm.fileList = Array.from(nextFileMap.values())
+
+  const skippedCount = files.length - validFiles.length
+  if (skippedCount > 0) {
+    ElMessage.warning(`已跳过 ${skippedCount} 个不支持的文件`)
+  }
+}
+
 // 文件变化
 function handleFileChange(file, fileList) {
-  uploadForm.fileList = fileList
+  mergeUploadFiles(fileList.map(item => item.raw || item))
 }
 
 // 文件移除
 function handleFileRemove(file, fileList) {
-  uploadForm.fileList = fileList
+  uploadForm.fileList = fileList.map(item => normalizeUploadItem(item.raw || item, item.uid))
+}
+
+function openFolderPicker() {
+  folderInputRef.value?.click()
+}
+
+function handleFolderChange(event) {
+  const files = Array.from(event.target.files || [])
+  if (files.length > 0) {
+    mergeUploadFiles(files)
+  }
+
+  if (folderInputRef.value) {
+    folderInputRef.value.value = ''
+  }
 }
 
 // 上传文件
@@ -516,12 +597,17 @@ async function handleUpload() {
     return
   }
 
+  // 计算总文件大小
+  const totalSize = uploadForm.fileList.reduce((sum, file) => sum + (file.size || 0), 0)
+  const totalSizeGB = (totalSize / (1024 * 1024 * 1024)).toFixed(2)
+
+  console.log(`准备上传 ${uploadForm.fileList.length} 个文件，总大小: ${totalSizeGB} GB`)
+
   uploading.value = true
   try {
-    const files = uploadForm.fileList.map(item => item.raw)
     const result = await bankStatementApi.uploadBankStatements(
       selectedCaseId.value,
-      files,
+      uploadForm.fileList,
       uploadForm.templateId
     )
 
@@ -534,7 +620,20 @@ async function handleUpload() {
     // 开始轮询任务进度
     startPolling()
   } catch (error) {
-    ElMessage.error('上传失败')
+    console.error('上传失败详情:', error)
+
+    // 显示详细错误信息
+    let errorMsg = '上传失败'
+    if (error.message) {
+      errorMsg += ': ' + error.message
+    }
+    if (error.code === 'ECONNABORTED') {
+      errorMsg = '上传超时，请检查网络连接或尝试上传较小的文件'
+    } else if (error.code === 'ERR_NETWORK') {
+      errorMsg = '网络错误，可能是文件太大导致浏览器内存不足。建议：\n1. 使用 Chrome 或 Firefox 浏览器\n2. 分批上传文件'
+    }
+
+    ElMessage.error(errorMsg)
   } finally {
     uploading.value = false
   }
@@ -740,11 +839,27 @@ onUnmounted(() => {
   margin-bottom: 0;
 }
 
+.upload-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.upload-actions__hint {
+  font-size: 12px;
+  color: #909399;
+}
+
 .statistics {
   margin-top: 20px;
   padding: 20px;
   background-color: #f5f7fa;
   border-radius: 4px;
+}
+
+.folder-input {
+  display: none;
 }
 
 .el-icon--upload {

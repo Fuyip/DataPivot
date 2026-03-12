@@ -1,16 +1,24 @@
-from typing import Optional
+import os
+import shutil
+import tempfile
+from pathlib import Path
+from typing import Callable, Optional
+from uuid import uuid4
+
+import pandas as pd
 from sqlalchemy import text, create_engine
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import sessionmaker, Session
 from database import get_db, get_system_db
 from backend.schemas.case_card import CaseCardCreate, CaseCardUpdate
 from backend.services.case_service import get_case_database_url
-import pandas as pd
 from io import BytesIO
 
 
 class CaseCardService:
     """案件银行卡服务"""
+
+    IMPORT_BASE_DIR = Path("./data/case_card_imports")
 
     @staticmethod
     def _get_case_db(database_name: str) -> Session:
@@ -276,48 +284,134 @@ class CaseCardService:
     @staticmethod
     def import_from_template(database_name: str, case_code: str, file_content: bytes, case_id: int, user_id: int) -> dict:
         """从模板导入案件银行卡"""
-        import json
+        temp_path = None
+        try:
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".xlsx") as temp_file:
+                temp_file.write(file_content)
+                temp_path = temp_file.name
 
-        db = CaseCardService._get_case_db(database_name)
-        system_db = next(get_system_db())
+            return CaseCardService.process_import_file(
+                database_name=database_name,
+                case_code=case_code,
+                file_path=temp_path
+            )
+        except Exception as e:
+            raise ValueError(f"导入失败: {str(e)}")
+        finally:
+            if temp_path and os.path.exists(temp_path):
+                os.unlink(temp_path)
+
+    @staticmethod
+    def enqueue_import_task(
+        database_name: str,
+        case_code: str,
+        case_id: int,
+        user_id: int,
+        upload_file
+    ) -> dict:
+        """创建后台导入任务并保存上传文件"""
+        from database import SystemSessionLocal
+        from backend.models.import_task import ImportTask
+        from backend.tasks.case_card_import_tasks import process_case_card_import
+
+        system_db = SystemSessionLocal()
+        storage_dir = None
 
         try:
-            # 读取Excel文件，指定卡号列为字符串类型，防止科学计数法
-            df = pd.read_excel(BytesIO(file_content), dtype={'卡号': str})
+            original_filename = Path(upload_file.filename or "case_card_import.xlsx").name
+            task_ref = str(uuid4())
+            storage_dir = CaseCardService.IMPORT_BASE_DIR / "raw" / f"case_{case_id}" / task_ref
+            storage_dir.mkdir(parents=True, exist_ok=True)
+            storage_path = storage_dir / original_filename
 
-            # 验证必需列
-            required_columns = ['卡号']
-            for col in required_columns:
-                if col not in df.columns:
-                    raise ValueError(f"缺少必需列: {col}")
+            upload_file.file.seek(0)
+            with open(storage_path, "wb") as target:
+                shutil.copyfileobj(upload_file.file, target)
 
-            # 获取卡类型字典，建立value到label的映射
-            card_types = CaseCardService.get_card_types()
-            value_to_label_map = {ct['value']: ct['label'] for ct in card_types}
-            label_to_label_map = {ct['label']: ct['label'] for ct in card_types}
-
-            # 创建导入任务记录
-            from backend.models.import_task import ImportTask
             import_task = ImportTask(
                 case_id=case_id,
-                task_type='case_card',
-                file_name='imported_file.xlsx',
-                total_count=len(df),
-                created_by=user_id
+                task_type="case_card",
+                file_name=original_filename,
+                status="pending",
+                progress=0,
+                current_step="等待后台处理",
+                created_by=user_id,
+                storage_path=str(storage_path)
             )
             system_db.add(import_task)
             system_db.commit()
             system_db.refresh(import_task)
 
-            task_id = import_task.id
+            async_result = process_case_card_import.delay(
+                import_task.id,
+                case_id,
+                database_name,
+                case_code,
+                str(storage_path)
+            )
+
+            import_task.task_ref = async_result.id
+            system_db.commit()
+
+            return {
+                "task_id": import_task.id,
+                "status": import_task.status,
+                "file_name": import_task.file_name
+            }
+        except Exception:
+            system_db.rollback()
+            if storage_dir and storage_dir.exists():
+                shutil.rmtree(storage_dir, ignore_errors=True)
+            raise
+        finally:
+            system_db.close()
+
+    @staticmethod
+    def process_import_file(
+        database_name: str,
+        case_code: str,
+        file_path: str,
+        task_id: int | None = None,
+        progress_callback: Optional[Callable[[str, float, int | None], None]] = None
+    ) -> dict:
+        """处理导入文件并写入案件银行卡表"""
+        db = CaseCardService._get_case_db(database_name)
+
+        try:
+            if progress_callback:
+                progress_callback("读取导入文件", 5, None)
+
+            df = pd.read_excel(file_path, dtype={'卡号': str})
+
+            required_columns = ['卡号']
+            for col in required_columns:
+                if col not in df.columns:
+                    raise ValueError(f"缺少必需列: {col}")
+
+            total_count = len(df)
+            if progress_callback:
+                progress_callback("校验导入数据", 10, total_count)
+
+            card_types = CaseCardService.get_card_types()
+            value_to_label_map = {ct['value']: ct['label'] for ct in card_types}
+            label_to_label_map = {ct['label']: ct['label'] for ct in card_types}
+
+            check_column_sql = """
+                SELECT COUNT(*)
+                FROM information_schema.COLUMNS
+                WHERE TABLE_SCHEMA = DATABASE()
+                AND TABLE_NAME = 'case_card'
+                AND COLUMN_NAME = 'import_task_id'
+            """
+            has_import_task_id = db.execute(text(check_column_sql)).scalar() > 0
 
             success_count = 0
             error_count = 0
             errors = []
+            progress_interval = max(1, min(200, total_count // 20 or 1))
 
             for index, row in df.iterrows():
                 try:
-                    # 检查卡号是否为空
                     if pd.isna(row['卡号']) or str(row['卡号']).strip() == '':
                         error_count += 1
                         errors.append({
@@ -329,7 +423,6 @@ class CaseCardService:
 
                     card_no = str(row['卡号']).strip()
 
-                    # 检查卡号是否已存在
                     check_sql = "SELECT id FROM case_card WHERE card_no = :card_no"
                     existing = db.execute(text(check_sql), {"card_no": card_no}).fetchone()
                     if existing:
@@ -341,25 +434,17 @@ class CaseCardService:
                         })
                         continue
 
-                    # 自动匹配银行名称（不拒绝导入，记录为NULL）
                     match_result = CaseCardService.match_bank_name(card_no)
-                    if match_result['matched']:
-                        bank_name = match_result['bank_name']
-                    else:
-                        bank_name = None  # 未匹配的银行名称设为NULL
+                    bank_name = match_result['bank_name'] if match_result['matched'] else None
 
-                    # 处理卡类型：将value转换为label，或保持label不变
                     card_type_input = str(row.get('卡类型', '')).strip() if pd.notna(row.get('卡类型')) else None
                     card_type_label = None
                     if card_type_input:
-                        # 先检查是否是label（如"入款卡"）
                         if card_type_input in label_to_label_map:
                             card_type_label = card_type_input
-                        # 再检查是否是value（如"c15q"），需要转换为label
                         elif card_type_input in value_to_label_map:
                             card_type_label = value_to_label_map[card_type_input]
                         else:
-                            # 既不是label也不是value，拒绝导入
                             error_count += 1
                             errors.append({
                                 "row": index + 2,
@@ -368,7 +453,6 @@ class CaseCardService:
                             })
                             continue
                     else:
-                        # 卡类型为空，拒绝导入
                         error_count += 1
                         errors.append({
                             "row": index + 2,
@@ -377,7 +461,6 @@ class CaseCardService:
                         })
                         continue
 
-                    # 准备数据
                     card_data = {
                         "case_no": case_code,
                         "card_no": card_no,
@@ -390,18 +473,7 @@ class CaseCardService:
                         "is_main": 0
                     }
 
-                    # 检查表是否有 import_task_id 字段
-                    check_column_sql = """
-                        SELECT COUNT(*)
-                        FROM information_schema.COLUMNS
-                        WHERE TABLE_SCHEMA = DATABASE()
-                        AND TABLE_NAME = 'case_card'
-                        AND COLUMN_NAME = 'import_task_id'
-                    """
-                    has_import_task_id = db.execute(text(check_column_sql)).scalar() > 0
-
-                    # 插入数据
-                    if has_import_task_id:
+                    if has_import_task_id and task_id is not None:
                         card_data["import_task_id"] = task_id
                         insert_sql = """
                             INSERT INTO case_card (case_no, source, user_id, card_no, bank_name,
@@ -419,7 +491,6 @@ class CaseCardService:
 
                     db.execute(text(insert_sql), card_data)
                     success_count += 1
-
                 except IntegrityError:
                     error_count += 1
                     errors.append({
@@ -429,7 +500,6 @@ class CaseCardService:
                     })
                 except Exception as e:
                     error_count += 1
-                    # 安全获取卡号，避免 nan 值
                     safe_card_no = "未知"
                     if 'card_no' in locals():
                         safe_card_no = card_no
@@ -441,29 +511,30 @@ class CaseCardService:
                         "card_no": safe_card_no,
                         "error": str(e)
                     })
+                finally:
+                    if progress_callback and (
+                        index == total_count - 1 or (index + 1) % progress_interval == 0
+                    ):
+                        progress = 15 + ((index + 1) / max(total_count, 1)) * 80
+                        progress_callback("导入银行卡数据", round(progress, 2), total_count)
 
             db.commit()
 
-            # 更新导入任务统计
-            import_task.success_count = success_count
-            import_task.error_count = error_count
-            import_task.error_details = json.dumps(errors[:50], ensure_ascii=False)
-            system_db.commit()
+            if progress_callback:
+                progress_callback("整理导入结果", 95, total_count)
 
             return {
                 "task_id": task_id,
+                "total_count": total_count,
                 "success_count": success_count,
                 "error_count": error_count,
-                "errors": errors[:50]  # 返回前50个错误
+                "errors": errors[:50]
             }
-
         except Exception as e:
             db.rollback()
-            system_db.rollback()
             raise ValueError(f"导入失败: {str(e)}")
         finally:
             db.close()
-            system_db.close()
 
     @staticmethod
     def match_bank_name(card_no: str) -> dict:

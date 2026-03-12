@@ -81,10 +81,7 @@
             {{ getCardTypeLabel(row.card_type) }}
           </template>
         </el-table-column>
-        <el-table-column prop="holder_name" label="持卡人" width="120" />
-        <el-table-column prop="holder_id" label="身份证号" width="180" />
-        <el-table-column prop="phone" label="手机号" width="130" />
-        <el-table-column prop="remark" label="备注" show-overflow-tooltip />
+        <el-table-column prop="source" label="持卡人" width="120" />
         <el-table-column prop="created_at" label="创建时间" width="180" />
         <el-table-column label="操作" width="150" fixed="right">
           <template #default="{ row }">
@@ -132,8 +129,8 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="持卡人" prop="holder_name">
-          <el-input v-model="formData.holder_name" placeholder="请输入持卡人姓名" />
+        <el-form-item label="持卡人" prop="source">
+          <el-input v-model="formData.source" placeholder="请输入持卡人姓名" />
         </el-form-item>
         <el-form-item label="身份证号" prop="holder_id">
           <el-input v-model="formData.holder_id" placeholder="请输入身份证号" />
@@ -176,10 +173,31 @@
     </el-dialog>
 
     <!-- 导入任务对话框 -->
-    <el-dialog v-model="showImportTasks" title="导入任务" width="800px">
+    <el-dialog
+      v-model="showImportTasks"
+      title="导入任务"
+      width="960px"
+      @close="handleImportTasksClose"
+    >
       <el-table :data="importTasks" v-loading="tasksLoading">
         <el-table-column prop="id" label="任务ID" width="80" />
         <el-table-column prop="file_name" label="文件名" show-overflow-tooltip />
+        <el-table-column prop="status" label="状态" width="110">
+          <template #default="{ row }">
+            <el-tag :type="getImportTaskStatusTagType(row.status)">
+              {{ getImportTaskStatusLabel(row.status) }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="progress" label="进度" width="180">
+          <template #default="{ row }">
+            <el-progress
+              :percentage="Math.round(row.progress || 0)"
+              :status="row.status === 'failed' ? 'exception' : row.status === 'completed' ? 'success' : ''"
+            />
+          </template>
+        </el-table-column>
+        <el-table-column prop="current_step" label="当前步骤" width="180" show-overflow-tooltip />
         <el-table-column prop="total_count" label="总数" width="80" />
         <el-table-column prop="success_count" label="成功" width="80" />
         <el-table-column prop="error_count" label="失败" width="80" />
@@ -194,7 +212,14 @@
             >
               查看错误
             </el-button>
-            <el-button link type="danger" @click="handleDeleteTask(row.id)">删除</el-button>
+            <el-button
+              link
+              type="danger"
+              :disabled="['pending', 'processing'].includes(row.status)"
+              @click="handleDeleteTask(row.id)"
+            >
+              删除
+            </el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -211,7 +236,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, computed } from 'vue'
+import { ref, reactive, onMounted, onUnmounted, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { caseApi } from '@/api/case'
 import { caseCardApi } from '@/api/caseCard'
@@ -251,7 +276,7 @@ const formData = reactive({
   card_no: '',
   bank_name: '',
   card_type: '',
-  holder_name: '',
+  source: '',
   holder_id: '',
   phone: '',
   remark: ''
@@ -275,6 +300,7 @@ const importLoading = ref(false)
 const showImportTasks = ref(false)
 const importTasks = ref([])
 const tasksLoading = ref(false)
+let importTaskPollingTimer = null
 const taskPagination = reactive({
   page: 1,
   page_size: 20,
@@ -372,7 +398,7 @@ const handleAdd = () => {
     card_no: '',
     bank_name: '',
     card_type: '',
-    holder_name: '',
+    source: '',
     holder_id: '',
     phone: '',
     remark: ''
@@ -486,12 +512,9 @@ const handleImportSubmit = async () => {
   importLoading.value = true
   try {
     const data = await caseCardApi.importCaseCards(selectedCaseId.value, importFile.value)
-    ElMessage.success(`导入完成: 成功 ${data.success_count} 条, 失败 ${data.error_count} 条`)
+    ElMessage.success('文件上传成功，后台处理中')
     importDialogVisible.value = false
-    if (showImportTasks.value) {
-      loadImportTasks()
-    }
-    loadTableData()
+    handleShowImportTasks()
   } catch (error) {
     ElMessage.error(error.response?.data?.detail || '导入失败')
   } finally {
@@ -565,10 +588,65 @@ const loadImportTasks = async () => {
     const data = await caseCardApi.getImportTasks(selectedCaseId.value, params)
     importTasks.value = data.items || []
     taskPagination.total = data.total || 0
+    if (showImportTasks.value) {
+      const hasActiveTasks = importTasks.value.some(task => ['pending', 'processing'].includes(task.status))
+      if (hasActiveTasks) {
+        startImportTaskPolling()
+      } else {
+        stopImportTaskPolling()
+        loadTableData()
+      }
+    }
   } catch (error) {
     ElMessage.error('加载导入任务失败')
   } finally {
     tasksLoading.value = false
+  }
+}
+
+const getImportTaskStatusLabel = (status) => {
+  const statusMap = {
+    pending: '等待中',
+    processing: '处理中',
+    completed: '已完成',
+    failed: '失败'
+  }
+  return statusMap[status] || status || '未知'
+}
+
+const getImportTaskStatusTagType = (status) => {
+  const tagMap = {
+    pending: 'info',
+    processing: 'warning',
+    completed: 'success',
+    failed: 'danger'
+  }
+  return tagMap[status] || 'info'
+}
+
+const startImportTaskPolling = () => {
+  if (importTaskPollingTimer || !showImportTasks.value) return
+
+  importTaskPollingTimer = setInterval(() => {
+    if (!showImportTasks.value) {
+      stopImportTaskPolling()
+      return
+    }
+
+    const hasActiveTasks = importTasks.value.some(task => ['pending', 'processing'].includes(task.status))
+    if (!hasActiveTasks) {
+      stopImportTaskPolling()
+      return
+    }
+
+    loadImportTasks()
+  }, 3000)
+}
+
+const stopImportTaskPolling = () => {
+  if (importTaskPollingTimer) {
+    clearInterval(importTaskPollingTimer)
+    importTaskPollingTimer = null
   }
 }
 
@@ -593,6 +671,10 @@ const downloadErrorReport = (errors) => {
 const handleShowImportTasks = () => {
   showImportTasks.value = true
   loadImportTasks()
+}
+
+const handleImportTasksClose = () => {
+  stopImportTaskPolling()
 }
 
 const showTaskErrors = (task) => {
@@ -642,6 +724,10 @@ const handleDeleteTask = async (taskId) => {
 
 onMounted(() => {
   loadCaseList()
+})
+
+onUnmounted(() => {
+  stopImportTaskPolling()
 })
 </script>
 

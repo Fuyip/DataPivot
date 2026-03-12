@@ -139,23 +139,17 @@ async def import_case_cards(
         raise HTTPException(status_code=400, detail="只支持Excel文件(.xlsx, .xls)")
 
     try:
-        content = await file.read()
-        result = CaseCardService.import_from_template(
+        result = CaseCardService.enqueue_import_task(
             case.database_name,
             case.case_code,
-            content,
             case_id,
-            current_user.id
+            current_user.id,
+            file
         )
 
         return success_response(
-            data={
-                "task_id": result['task_id'],
-                "success_count": result['success_count'],
-                "error_count": result['error_count'],
-                "errors": result['errors']
-            },
-            message="导入完成"
+            data=result,
+            message="导入任务已创建"
         )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -219,6 +213,8 @@ async def delete_cards_by_task(
         task = ImportTaskService.get_import_task(task_id)
         if not task or task['case_id'] != case_id:
             raise HTTPException(status_code=404, detail="导入任务不存在")
+        if task.get('status') in ['pending', 'processing']:
+            raise HTTPException(status_code=400, detail="导入任务正在处理中，暂不支持删除")
 
         result = ImportTaskService.delete_cards_by_task(case.database_name, task_id)
         return success_response(

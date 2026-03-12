@@ -16,14 +16,27 @@ from database import SystemSessionLocal
 class CallbackTask(Task):
     """带回调的任务基类"""
 
+    @staticmethod
+    def resolve_business_task_id(celery_task_id, args, kwargs):
+        """优先使用业务任务ID，回退到 Celery 任务ID。"""
+        if kwargs and kwargs.get("task_id"):
+            return kwargs["task_id"]
+        if args and len(args) >= 3:
+            return args[2]
+        return celery_task_id
+
     def on_success(self, retval, task_id, args, kwargs):
         """任务成功回调"""
-        self.update_task_status(task_id, "completed", progress=100)
+        self.update_task_status(
+            self.resolve_business_task_id(task_id, args, kwargs),
+            "completed",
+            progress=100
+        )
 
     def on_failure(self, exc, task_id, args, kwargs, einfo):
         """任务失败回调"""
         self.update_task_status(
-            task_id,
+            self.resolve_business_task_id(task_id, args, kwargs),
             "failed",
             error_message=str(exc)
         )
@@ -41,7 +54,7 @@ class CallbackTask(Task):
                 for key, value in kwargs.items():
                     setattr(task, key, value)
 
-                if status == "completed":
+                if status in {"completed", "failed", "cancelled"}:
                     task.completed_at = datetime.now()
 
                 db.commit()
@@ -51,7 +64,8 @@ class CallbackTask(Task):
 
 @celery_app.task(base=CallbackTask, bind=True)
 def process_bank_statements(self, case_id: int, database_name: str,
-                           task_id: str, storage_path: str):
+                           task_id: str, storage_path: str,
+                           template_id: int | None = None):
     """
     处理银行流水任务
 
@@ -86,23 +100,43 @@ def process_bank_statements(self, case_id: int, database_name: str,
         logger.info(f"开始处理银行流水任务: {task_id}, 案件ID: {case_id}")
 
         # 初始化处理器
-        processor = BankStatementProcessor(case_id, database_name, task_id)
+        processor = BankStatementProcessor(
+            case_id,
+            database_name,
+            task_id,
+            template_id=template_id,
+            db_session=db
+        )
         processor.connect_database()
 
         # 移动文件到处理目录
         processing_dir = file_service.move_to_processing(case_id, task_id)
 
         # 进度回调函数
-        def update_progress(step: str, progress: float = None):
+        def update_progress(
+            step: str,
+            progress: float = None,
+            processed_files: int | None = None,
+            total_files: int | None = None
+        ):
             task.current_step = step
             if progress is not None:
                 task.progress = progress
+            if processed_files is not None:
+                task.processed_files = processed_files
+            if total_files is not None:
+                task.file_count = total_files
             db.commit()
 
             # 更新Celery任务状态
             self.update_state(
                 state='PROGRESS',
-                meta={'current_step': step, 'progress': progress or task.progress}
+                meta={
+                    'current_step': step,
+                    'progress': progress or task.progress,
+                    'processed_files': task.processed_files,
+                    'total_files': task.file_count
+                }
             )
 
         # 1. 解压文件
@@ -112,7 +146,8 @@ def process_bank_statements(self, case_id: int, database_name: str,
         # 2. 统计文件
         update_progress("统计文件", 20)
         file_counts = processor.count_files(processing_dir)
-        task.processed_files = sum(file_counts.values())
+        task.file_count = sum(file_counts.values())
+        task.processed_files = 0
         db.commit()
 
         # 3. 清空临时表

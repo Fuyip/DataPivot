@@ -1,8 +1,9 @@
 """
 银行流水API路由
 """
+import json
 from typing import List, Optional
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Query
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, Query
 from sqlalchemy.orm import Session
 from sqlalchemy import desc
 from datetime import datetime
@@ -28,6 +29,8 @@ router = APIRouter(tags=["银行流水"])
 async def upload_bank_statements(
     case_id: int,
     files: List[UploadFile] = File(..., description="银行流水压缩包"),
+    relative_paths_json: Optional[str] = Form(None, description="目录上传时的相对路径JSON数组"),
+    template_id: Optional[int] = Form(None, description="导入规则模板ID"),
     current_user: UserSchema = Depends(get_current_active_user),
     db: Session = Depends(get_system_db)
 ):
@@ -61,9 +64,27 @@ async def upload_bank_statements(
 
     file_names = []
     total_size = 0
+    relative_paths: List[Optional[str]] = []
 
-    for file in files:
-        filename, file_size = await file_service.save_upload_file(file, upload_dir)
+    if relative_paths_json:
+        try:
+            parsed_relative_paths = json.loads(relative_paths_json)
+            if not isinstance(parsed_relative_paths, list):
+                return error_response(400, "relative_paths_json 必须是数组")
+            relative_paths = parsed_relative_paths
+        except json.JSONDecodeError:
+            return error_response(400, "relative_paths_json 不是合法的 JSON")
+
+    for index, file in enumerate(files):
+        relative_path = None
+        if relative_paths and index < len(relative_paths):
+            relative_path = relative_paths[index]
+
+        filename, file_size = await file_service.save_upload_file(
+            file,
+            upload_dir,
+            relative_path
+        )
         file_names.append(filename)
         total_size += file_size
 
@@ -71,6 +92,7 @@ async def upload_bank_statements(
     task = BankStatementTask(
         case_id=case_id,
         task_id=task_id,
+        template_id=template_id,
         status="pending",
         file_count=len(files),
         file_names=file_names,
@@ -87,7 +109,8 @@ async def upload_bank_statements(
         case_id=case_id,
         database_name=case.database_name,
         task_id=task_id,
-        storage_path=str(upload_dir)
+        storage_path=str(upload_dir),
+        template_id=template_id
     )
 
     return success_response(

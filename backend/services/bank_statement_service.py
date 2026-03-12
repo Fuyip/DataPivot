@@ -15,6 +15,14 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.engine import Engine
 
 from backend.services.case_service import get_case_database_url
+
+# 导入 tools 目录下的 bank_config
+import sys
+from pathlib import Path
+tools_dir = Path(__file__).parent.parent.parent / "tools"
+if str(tools_dir) not in sys.path:
+    sys.path.insert(0, str(tools_dir))
+
 from bank_config import NAME_DICT, REG_STR, REG_TIME_STR
 
 
@@ -64,6 +72,16 @@ class BankStatementProcessor:
         self.success_records = 0
         self.error_records = 0
 
+    def _normalize_datetime_series(self, series: pd.Series) -> pd.Series:
+        """将非法日期值归一化为 NaT，入库时会写入 NULL。"""
+        cleaned = series.astype(str).str.replace(self.REG_TIME_STR, '', regex=True).str.strip()
+        cleaned = cleaned.mask(cleaned.str.lower().isin(['', 'nan', 'nat', 'none']))
+        cleaned = cleaned.mask(cleaned.str.fullmatch(r'0+'))
+        cleaned = cleaned.mask(cleaned.str.len() < 8)
+
+        normalized = pd.to_datetime(cleaned, errors='coerce')
+        return normalized.where(normalized.notna(), np.nan)
+
     def connect_database(self):
         """连接案件数据库"""
         db_url = get_case_database_url(self.database_name)
@@ -99,7 +117,41 @@ class BankStatementProcessor:
                 try:
                     if zipfile.is_zipfile(file_path):
                         with zipfile.ZipFile(file_path, 'r') as zip_ref:
-                            zip_ref.extractall(root)
+                            # 处理中文文件名编码问题
+                            for member in zip_ref.namelist():
+                                # 跳过目录条目
+                                if member.endswith('/'):
+                                    continue
+
+                                member_name = member
+
+                                # 尝试修复文件名编码
+                                # zipfile 默认用 cp437 解码,但实际可能是 UTF-8 或 GBK
+                                try:
+                                    # 先转回字节
+                                    member_bytes = member.encode('cp437')
+
+                                    # 尝试用 UTF-8 解码(优先)
+                                    try:
+                                        member_name = member_bytes.decode('utf-8')
+                                    except:
+                                        # 如果 UTF-8 失败,尝试 GB18030
+                                        try:
+                                            member_name = member_bytes.decode('gb18030')
+                                        except:
+                                            # 都失败就用原始名称
+                                            member_name = member
+                                except:
+                                    # 如果转换失败,使用原始文件名
+                                    member_name = member
+
+                                # 提取文件
+                                source = zip_ref.open(member)
+                                target_path = Path(root) / member_name
+                                target_path.parent.mkdir(parents=True, exist_ok=True)
+
+                                with open(target_path, 'wb') as target:
+                                    target.write(source.read())
                         file_path.unlink()  # 删除压缩包
                         logger.debug(f"已解压ZIP文件: {file}")
                     elif tarfile.is_tarfile(file_path):
@@ -196,8 +248,7 @@ class BankStatementProcessor:
             elif field_type == 'float':
                 dfn[field_name] = dfn[field_name].mask(dfn[field_name] == "", np.nan)
             elif field_type == 'datetime':
-                dfn[field_name] = dfn[field_name].astype(str).str.replace(self.REG_TIME_STR, '', regex=True)
-                dfn[field_name] = dfn[field_name].mask(dfn[field_name] == "", np.nan)
+                dfn[field_name] = self._normalize_datetime_series(df[column_name])
             elif field_type == 'card_no':
                 dfn[field_name] = dfn[field_name].apply(self.extract_first_number)
             elif field_type == 'tag':
@@ -248,27 +299,34 @@ class BankStatementProcessor:
 
         logger.info(f"开始处理文件，总计: {total_files}")
 
+        if total_files == 0:
+            return
+
         for root, dirs, files in os.walk(directory):
             for filename in files:
                 for data_type, table_name, pattern_func in file_configs:
                     if pattern_func(filename):
                         try:
-                            if progress_callback:
-                                progress = 30 + (processed / total_files * 60)  # 30-90%
-                                progress_callback(f"正在处理: {filename}", progress)
-
                             self._process_single_file(
                                 Path(root) / filename,
                                 data_type,
                                 table_name
                             )
 
-                            processed += 1
-
                         except Exception as e:
                             logger.error(f"处理文件失败 {filename}: {e}")
                             self.error_files.append(filename)
                             self.error_records += 1
+                        finally:
+                            processed += 1
+                            if progress_callback:
+                                progress = 30 + (processed / total_files * 60)  # 30-90%
+                                progress_callback(
+                                    f"正在处理: {filename}",
+                                    progress,
+                                    processed,
+                                    total_files
+                                )
 
         logger.info(f"文件处理完成，成功: {processed}, 失败: {len(self.error_files)}")
 
@@ -341,16 +399,30 @@ class BankStatementProcessor:
             logger.info(f"账号卡号转换完成，操作行数: {result.rowcount}")
 
     def _transfer_table(self, table_name: str):
-        """转移单个表的数据"""
-        sql = text(f"""
-            INSERT IGNORE INTO {table_name}
-            SELECT * FROM {table_name}_tmp
-        """)
+        """转移单个表的数据。"""
 
         with self.engine.connect() as conn:
+            # 获取总记录数
+            count_sql = text(f"SELECT COUNT(*) FROM {table_name}_tmp")
+            total = conn.execute(count_sql).scalar()
+
+            if total == 0:
+                logger.info(f"{table_name} 无数据需要转移")
+                return
+
+            sql = text(f"""
+                INSERT IGNORE INTO {table_name}
+                SELECT * FROM {table_name}_tmp
+            """)
             result = conn.execute(sql)
             conn.commit()
             logger.info(f"{table_name} 转移完成，操作行数: {result.rowcount}")
+
+    def _execute_insert_select(self, conn, insert_sql: str):
+        """整表执行 INSERT ... SELECT 语句。"""
+        result = conn.execute(text(insert_sql))
+        conn.commit()
+        logger.debug(f"INSERT SELECT 执行完成，操作行数: {result.rowcount}")
 
     def execute_post_processing_sql(self, progress_callback: Optional[Callable] = None):
         """
@@ -381,8 +453,13 @@ class BankStatementProcessor:
                 # 执行每个SQL语句
                 with self.engine.connect() as conn:
                     for sql_stmt in sql_statements:
-                        conn.execute(text(sql_stmt))
-                    conn.commit()
+                        # 判断是否是大数据量的INSERT语句
+                        if sql_stmt.upper().startswith('INSERT') and 'SELECT' in sql_stmt.upper():
+                            self._execute_insert_select(conn, sql_stmt)
+                        else:
+                            # 直接执行（TRUNCATE、DELETE等）
+                            conn.execute(text(sql_stmt))
+                            conn.commit()
 
                 logger.info(f"SQL脚本执行成功: {script_name}")
 

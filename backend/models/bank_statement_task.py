@@ -1,7 +1,7 @@
 """
 银行流水处理任务模型
 """
-from sqlalchemy import Column, Integer, String, DateTime, Text, Float, ForeignKey, JSON
+from sqlalchemy import Column, Integer, String, DateTime, Text, Float, JSON
 from sqlalchemy.sql import func
 from database import Base
 
@@ -11,9 +11,9 @@ class BankStatementTask(Base):
     __tablename__ = "bank_statement_tasks"
 
     id = Column(Integer, primary_key=True, index=True, comment="任务ID")
-    case_id = Column(Integer, ForeignKey("cases.id"), nullable=False, index=True, comment="案件ID")
+    case_id = Column(Integer, nullable=False, index=True, comment="案件ID")
     task_id = Column(String(100), unique=True, nullable=False, index=True, comment="Celery任务ID")
-    template_id = Column(Integer, ForeignKey("import_rule_templates.id"), nullable=True, index=True, comment="使用的规则模板ID")
+    template_id = Column(Integer, nullable=True, index=True, comment="使用的规则模板ID")
 
     # 任务信息
     status = Column(String(20), default="pending", comment="任务状态: pending/processing/completed/failed/cancelled")
@@ -42,7 +42,7 @@ class BankStatementTask(Base):
     error_message = Column(Text, comment="错误详情")
 
     # 时间戳
-    created_by = Column(Integer, ForeignKey("users.id"), comment="创建人ID")
+    created_by = Column(Integer, comment="创建人ID")
     created_at = Column(DateTime(timezone=True), server_default=func.now(), comment="创建时间")
     started_at = Column(DateTime(timezone=True), comment="开始处理时间")
     completed_at = Column(DateTime(timezone=True), comment="完成时间")

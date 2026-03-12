@@ -4,19 +4,36 @@ export const bankStatementApi = {
   // 上传银行流水文件
   uploadBankStatements(caseId, files, templateId = null) {
     const formData = new FormData()
-    files.forEach(file => {
-      formData.append('files', file)
+    const relativePaths = []
+
+    files.forEach(item => {
+      const rawFile = item.raw || item
+      const relativePath = item.relativePath || rawFile.webkitRelativePath || ''
+
+      formData.append('files', rawFile)
+
+      if (relativePath) {
+        relativePaths.push(relativePath)
+      } else {
+        relativePaths.push(null)
+      }
     })
 
     if (templateId) {
       formData.append('template_id', templateId)
     }
 
+    if (relativePaths.some(path => path)) {
+      formData.append('relative_paths_json', JSON.stringify(relativePaths))
+    }
+
     return request.post(`/v1/cases/${caseId}/bank-statements/upload`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       },
-      timeout: 300000 // 5分钟超时
+      timeout: 600000, // 10分钟超时
+      maxContentLength: 20 * 1024 * 1024 * 1024, // 20GB
+      maxBodyLength: 20 * 1024 * 1024 * 1024 // 20GB
     })
   },
 

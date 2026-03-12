@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文件上传测试工具</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .container {
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #409EFF;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #66b1ff;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .log {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-radius: 4px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .log-entry {
+            margin-bottom: 5px;
+            padding: 5px;
+        }
+        .log-info {
+            color: #409EFF;
+        }
+        .log-success {
+            color: #67C23A;
+        }
+        .log-error {
+            color: #F56C6C;
+        }
+        .log-warning {
+            color: #E6A23C;
+        }
+        .file-info {
+            background-color: #ecf5ff;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>银行流水文件上传测试工具</h1>
+        <p>此工具用于诊断文件上传问题</p>
+
+        <div class="form-group">
+            <label>案件 ID:</label>
+            <input type="number" id="caseId" value="28" />
+        </div>
+
+        <div class="form-group">
+            <label>模板 ID:</label>
+            <input type="number" id="templateId" value="1" />
+        </div>
+
+        <div class="form-group">
+            <label>选择文件:</label>
+            <input type="file" id="fileInput" multiple accept=".zip,.rar,.7z,.csv,.tar,.gz,.tgz" />
+            <div id="fileInfo" class="file-info" style="display: none;"></div>
+        </div>
+
+        <button id="uploadBtn" onclick="uploadFiles()">开始上传</button>
+
+        <div class="log" id="log"></div>
+    </div>
+
+    <script>
+        const logDiv = document.getElementById('log');
+        const fileInput = document.getElementById('fileInput');
+        const fileInfoDiv = document.getElementById('fileInfo');
+        const uploadBtn = document.getElementById('uploadBtn');
+
+        function log(message, type = 'info') {
+            const entry = document.createElement('div');
+            entry.className = `log-entry log-${type}`;
+            const timestamp = new Date().toLocaleTimeString();
+            entry.textContent = `[${timestamp}] ${message}`;
+            logDiv.appendChild(entry);
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+        }
+
+        fileInput.addEventListener('change', function(e) {
+            const files = Array.from(e.target.files);
+            if (files.length === 0) {
+                fileInfoDiv.style.display = 'none';
+                return;
+            }
+
+            const totalSize = files.reduce((sum, file) => sum + file.size, 0);
+            const maxSize = 20 * 1024 * 1024 * 1024; // 20GB
+
+            let html = `<strong>已选择 ${files.length} 个文件</strong><br>`;
+            html += `总大小: ${formatBytes(totalSize)}<br>`;
+
+            if (totalSize > maxSize) {
+                html += `<span style="color: red;">⚠️ 警告：文件总大小超过 20GB 限制！</span><br>`;
+            }
+
+            html += '<br>文件列表:<br>';
+            files.forEach((file, index) => {
+                html += `${index + 1}. ${file.name} (${formatBytes(file.size)})<br>`;
+            });
+
+            fileInfoDiv.innerHTML = html;
+            fileInfoDiv.style.display = 'block';
+        });
+
+        async function uploadFiles() {
+            const caseId = document.getElementById('caseId').value;
+            const templateId = document.getElementById('templateId').value;
+            const files = fileInput.files;
+
+            if (files.length === 0) {
+                log('请先选择文件', 'error');
+                return;
+            }
+
+            const totalSize = Array.from(files).reduce((sum, file) => sum + file.size, 0);
+            log(`准备上传 ${files.length} 个文件，总大小: ${formatBytes(totalSize)}`, 'info');
+
+            // 检查文件大小
+            const maxSize = 20 * 1024 * 1024 * 1024; // 20GB
+            if (totalSize > maxSize) {
+                log(`错误：文件总大小 ${formatBytes(totalSize)} 超过 20GB 限制`, 'error');
+                return;
+            }
+
+            uploadBtn.disabled = true;
+            log('开始构建 FormData...', 'info');
+
+            try {
+                const formData = new FormData();
+
+                Array.from(files).forEach((file, index) => {
+                    formData.append('files', file);
+                    log(`添加文件 ${index + 1}: ${file.name}`, 'info');
+                });
+
+                if (templateId) {
+                    formData.append('template_id', templateId);
+                }
+
+                log('FormData 构建完成', 'success');
+                log('开始发送请求...', 'info');
+
+                const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsInVzZXJfaWQiOjEsImV4cCI6MTc3MzIzMDI4MH0.JZIvTtJE473K_kN5CaIgYEPIfmi334tkMNNMtKgjBPk';
+
+                const xhr = new XMLHttpRequest();
+
+                // 监听上传进度
+                xhr.upload.addEventListener('progress', function(e) {
+                    if (e.lengthComputable) {
+                        const percentComplete = Math.round((e.loaded / e.total) * 100);
+                        log(`上传进度: ${percentComplete}% (${formatBytes(e.loaded)} / ${formatBytes(e.total)})`, 'info');
+                    }
+                });
+
+                // 监听请求完成
+                xhr.addEventListener('load', function() {
+                    if (xhr.status === 200) {
+                        log('上传成功！', 'success');
+                        log(`响应: ${xhr.responseText}`, 'success');
+                    } else {
+                        log(`上传失败，状态码: ${xhr.status}`, 'error');
+                        log(`响应: ${xhr.responseText}`, 'error');
+                    }
+                    uploadBtn.disabled = false;
+                });
+
+                // 监听错误
+                xhr.addEventListener('error', function() {
+                    log('网络错误：请求失败', 'error');
+                    log('可能的原因：', 'warning');
+                    log('1. 文件太大导致浏览器内存不足', 'warning');
+                    log('2. 网络连接中断', 'warning');
+                    log('3. 服务器未响应', 'warning');
+                    uploadBtn.disabled = false;
+                });
+
+                // 监听超时
+                xhr.addEventListener('timeout', function() {
+                    log('请求超时', 'error');
+                    uploadBtn.disabled = false;
+                });
+
+                xhr.open('POST', `/api/v1/cases/${caseId}/bank-statements/upload`);
+                xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+                xhr.timeout = 600000; // 10分钟
+
+                log('发送请求到服务器...', 'info');
+                xhr.send(formData);
+
+            } catch (error) {
+                log(`错误: ${error.message}`, 'error');
+                uploadBtn.disabled = false;
+            }
+        }
+
+        log('测试工具已就绪', 'success');
+        log('请选择文件并点击"开始上传"按钮', 'info');
+    </script>
+</body>
+</html>

@@ -39,9 +39,10 @@ class ImportTaskService:
             # 查询数据
             offset = (page - 1) * page_size
             query_sql = """
-                SELECT id, case_id, task_type, file_name, total_count,
-                       success_count, error_count, error_details,
-                       created_by, created_at
+                SELECT id, case_id, task_type, file_name, status, progress,
+                       current_step, total_count, success_count, error_count,
+                       error_details, error_message, task_ref, storage_path,
+                       created_by, created_at, started_at, completed_at
                 FROM import_task
                 WHERE case_id = :case_id
                 ORDER BY created_at DESC
@@ -57,6 +58,7 @@ class ImportTaskService:
             items = []
             for row in result:
                 item = dict(row._mapping)
+                item['progress'] = float(item['progress'] or 0)
                 # 解析错误详情JSON
                 if item['error_details']:
                     try:
@@ -83,9 +85,10 @@ class ImportTaskService:
 
         try:
             query_sql = """
-                SELECT id, case_id, task_type, file_name, total_count,
-                       success_count, error_count, error_details,
-                       created_by, created_at
+                SELECT id, case_id, task_type, file_name, status, progress,
+                       current_step, total_count, success_count, error_count,
+                       error_details, error_message, task_ref, storage_path,
+                       created_by, created_at, started_at, completed_at
                 FROM import_task
                 WHERE id = :task_id
             """
@@ -94,6 +97,7 @@ class ImportTaskService:
 
             if result:
                 item = dict(result._mapping)
+                item['progress'] = float(item['progress'] or 0)
                 # 解析错误详情JSON
                 if item['error_details']:
                     try:

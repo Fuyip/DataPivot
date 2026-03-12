@@ -10,7 +10,11 @@ celery_app = Celery(
     "datapivot",
     broker=f"redis://{config.REDIS_HOST}:{config.REDIS_PORT}/0",
     backend=f"redis://{config.REDIS_HOST}:{config.REDIS_PORT}/1",
-    include=['backend.tasks.bank_statement_tasks', 'backend.tasks.case_tasks']  # 直接包含任务模块
+    include=[
+        'backend.tasks.bank_statement_tasks',
+        'backend.tasks.case_tasks',
+        'backend.tasks.case_card_import_tasks'
+    ]  # 直接包含任务模块
 )
 
 # 配置Celery

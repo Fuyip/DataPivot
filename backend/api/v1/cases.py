@@ -18,7 +18,8 @@ from backend.services.auth_service import get_current_active_user
 from backend.services.case_service import (
     create_case_database, drop_case_database,
     check_case_permission, get_user_cases,
-    get_case_permission_level, generate_case_code
+    get_case_permission_level, generate_case_code,
+    initialize_case_database_schema
 )
 from backend.schemas.user import User as UserSchema
 
@@ -172,6 +173,7 @@ def create_case(
     创建案件
     - 仅管理员可创建
     - 自动创建案件数据库
+    - 同步初始化案件数据库表结构
     - 自动给创建者分配admin权限
     """
     # 权限检查
@@ -204,9 +206,10 @@ def create_case(
     db.flush()  # 获取案件ID
 
     try:
-        # 创建案件数据库（仅创建空数据库）
+        # 创建案件数据库并立即初始化表结构，避免依赖后台 Worker
         database_name = create_case_database(new_case.id, new_case.case_name, new_case.case_code)
         new_case.database_name = database_name
+        initialize_case_database_schema(database_name, new_case.case_code)
 
         # 给创建者分配admin权限
         permission = UserCasePermission(
@@ -220,10 +223,6 @@ def create_case(
         db.commit()
         db.refresh(new_case)
 
-        # 异步初始化表结构
-        from backend.tasks.case_tasks import initialize_case_database_task
-        initialize_case_database_task.delay(database_name, new_case.case_code)
-
         return success_response(
             data={
                 "id": new_case.id,
@@ -235,7 +234,7 @@ def create_case(
                 "created_by": new_case.created_by,
                 "created_at": new_case.created_at.isoformat() if new_case.created_at else None
             },
-            message="案件创建成功，数据库表结构正在后台初始化"
+            message="案件创建成功，数据库表结构已初始化"
         )
     except Exception as e:
         db.rollback()

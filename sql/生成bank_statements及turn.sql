@@ -4,11 +4,11 @@ SELECT
 0 AS `id`,
 '6151' AS `case_no`,
 bas.card_no AS `card_no`,
-t_bai.accountOpeningName AS `card_name`,
+MAX(t_bai.accountOpeningName) AS `card_name`,
 bas.dict_trade_tag AS `dict_trade_tag`,
 bas.rival_card_no AS `rival_card_no`,
-bas.rival_card_name AS `rival_card_name`,
-bas.merchant_name AS `merchant_name`, 
+MAX(bas.rival_card_name) AS `rival_card_name`,
+MAX(bas.merchant_name) AS `merchant_name`,
 SUM(trade_money) AS `trade_money`,
 COUNT(id) AS `trade_count`,
 MIN(trade_date) AS `min_trade_date`,
@@ -17,7 +17,7 @@ FROM bank_all_statements bas
 LEFT JOIN(
 SELECT
 transactionCardNum,
-accountOpeningName
+MAX(accountOpeningName) AS accountOpeningName
 FROM
 bank_account_info
 GROUP BY transactionCardNum
